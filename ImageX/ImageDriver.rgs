@@ -1,0 +1,15 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {80F68129-5A4C-48EF-9949-61466CC456B2} = s 'Image Class'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+			}
+			TypeLib = s '{64801B79-246C-45C6-BBF7-5B7A9FCEA630}'
+			Version = s '1.0'
+		}
+	}
+}

@@ -1,0 +1,15 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {B2789850-0375-44A1-920E-C1919F0C1A42} = s 'DEMDriver Class'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+			}
+			TypeLib = s '{64801B79-246C-45C6-BBF7-5B7A9FCEA630}'
+			Version = s '1.0'
+		}
+	}
+}

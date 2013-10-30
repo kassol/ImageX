@@ -1,0 +1,189 @@
+// ImageX.idl : IDL source for ImageX
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ImageX.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(889C2904-3AFE-4920-A659-E7DC85753E0A),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IImage : IDispatch{
+	[id(1), helpstring("Open Image")] HRESULT Open([in] BSTR bstrPathName, [in] UINT uMode);
+	[id(2), helpstring("Create Image")] HRESULT CreateImg([in] BSTR bstrFilePath, [in] UINT uMode, [in] int Cols, [in] int Rows, [in] UINT DataType, [in] int nBandNum, [in] UINT BandType, [in] DOUBLE xStart, [in] DOUBLE yStart, [in] DOUBLE cellSize);
+	[id(3), helpstring("Close Image")] HRESULT Close(void);
+	[id(4), helpstring("IsGeoCoded")] HRESULT IsGeoCoded(void);
+	[id(5), helpstring("GetBandFormat")] HRESULT GetBandFormat([out] UINT* pBandFormat);
+	[id(7), helpstring("GetBandNum")] HRESULT GetBandNum([out] int* pBandNum);
+	[id(9), helpstring("GetRows")] HRESULT GetRows([out] int* pRows);
+	[id(11), helpstring("GetCols")] HRESULT GetCols([out] int* pCols);
+	[id(13), helpstring("GetDataType")] HRESULT GetDataType([out] UINT* pDataType);
+	[id(15), helpstring("GetByteOrder")] HRESULT GetByteOrder([out] UINT* pByteOrder);
+	[id(17), helpstring("GetScale")] HRESULT GetScale([out] FLOAT* pScale);
+	[id(18), helpstring("SetScale")] HRESULT SetScale([in] FLOAT Scale);
+	[id(19), helpstring("GetGrdInfo")] HRESULT GetGrdInfo([out] DOUBLE* xStart, [out] DOUBLE* yStart, [out] DOUBLE* cellSize);
+	[id(20), helpstring("SetGrdInfo")] HRESULT SetGrdInfo([in] DOUBLE xStart, [in] DOUBLE yStart, [in] DOUBLE cellSize);
+	[id(21), helpstring("HaveColorTable")] HRESULT HaveColorTable(void);
+	[id(22), helpstring("GetEntryNum")] HRESULT GetEntryNum([out] int* pEntryNum);
+	[id(23), helpstring("GetColorTable")] HRESULT GetColorTable([out] BYTE* pColorTable);
+	[id(24), helpstring("SetColorTable")] HRESULT SetColorTable([in] BYTE* pColorTable, [in] int nEntryNum);
+	[id(25), helpstring("GetResampleMethod")] HRESULT GetResampleMethod([out] int* pResampleMethod);
+	[id(26), helpstring("SetResampleMethod")] HRESULT SetResampleMethod([in] int nResampleMethod);
+	[id(27), helpstring("GetScanSize")] HRESULT GetScanSize([out] FLOAT* pScanSize);
+	[id(28), helpstring("SetScanSize")] HRESULT SetScanSize([in] FLOAT ScanSize);
+	[id(29), helpstring("GetBPB")] HRESULT GetBPB([out] int* pBPB);
+	[id(31), helpstring("GetBPP")] HRESULT GetBPP([out] int* pBPP);
+	[id(33), helpstring("GetPathName")] HRESULT GetPathName([out] BSTR* bstrPathName);
+	[id(34), helpstring("GetPixel")] HRESULT GetPixel([in] int nRows, [in] int nCols, [out] BYTE* pPixel);
+	[id(35), helpstring("SetPixel")] HRESULT SetPixel([in] int nRows, [in] int nCols, [in] BYTE* pPixel);
+	[id(36), helpstring("GetGray")] HRESULT GetGray([in] int nRows, [in] int nCols, [in] int nBand, [out] BYTE* gray);
+	[id(37), helpstring("SetGray")] HRESULT SetGray([in] int nRows, [in] int nCols, [in] int nBand, [out] BYTE* gray);
+	[id(38), helpstring("GetPixel")] HRESULT GetPixelF([in] FLOAT x, [in] FLOAT y, [out] BYTE* pPixel, [in] UINT nResampleMethod);
+	[id(39), helpstring("GetGray")] HRESULT GetGrayF([in] FLOAT x, [in] FLOAT y, [in] int nBand, [out] BYTE* pGray, [in] int nResampleMethod);
+	[id(40), helpstring("ReadImg")] HRESULT ReadImg([in] int nSrcLeft, [in] int nSrcTop, [in] int nSrcRight, [in] int nSrcBottom, [out] BYTE* pBuf, [in] int nBufWid, [in] int nBufHeight, [in] int nBandNum, [in] int nDestLeft, [in] int nDestTop, [in] int nDestRight, [in] int nDestBottom, [in] int nSrcSkip, [in] int nDestSkip);
+	[id(41), helpstring("WriteImg")] HRESULT WriteImg([in] int nSrcLeft, [in] int nSrcTop, [in] int nSrcRight, [in] int nSrcBottom, [out] BYTE* pBuf, [in] int nBufWid, [in] int nBufHeight, [in] int nBandNum, [in] int nDestLeft, [in] int nDestTop, [in] int nDestRight, [in] int nDestBottom, [in] int nSrcSkip, [in] int nDestSkip);
+	[id(42), helpstring("SetProgressInterface")] HRESULT SetProgressInterface(IUnknown* pIUnknown);
+	[id(43), helpstring("Get support extension")] HRESULT GetSupExts([out] BYTE* lpszExts, [in] UINT flags);
+	[id(44), helpstring("Image to world")] HRESULT Image2World([in] FLOAT x, [in] FLOAT y, [out] DOUBLE* pX, [out] DOUBLE* pY);
+	[id(45), helpstring("world to Image")] HRESULT World2Image([in] DOUBLE X, [in] DOUBLE Y, [out] FLOAT* px, [out] FLOAT* py);
+	[id(46), helpstring("GetDefaultBands")] HRESULT GetDefaultBand([out] int* nBandIndex);
+	[id(47), helpstring("GetCamera")] HRESULT GetCamera([out] BSTR* bstrCamera);
+	[id(48), helpstring("SetCamera")] HRESULT SetCamera([in] BSTR bstrCamera);
+	[id(49), helpstring("GetSensorType")] HRESULT GetSensorType([out] int* pSensorType);
+	[id(50), helpstring("SetSensorType")] HRESULT SetSensorType([in] int nSensorType);
+	[id(51), helpstring("GetDPI")] HRESULT GetDPI([out] FLOAT* pxDPI, [out] FLOAT* pyDPI);
+	[id(52), helpstring("SetDPI")] HRESULT SetDPI([in] FLOAT xDPI, [in] FLOAT yDPI);
+	[id(53)] HRESULT Tiff2JPG([in] BSTR bstrTiffPath, [in] BSTR bstrJPGPath);
+};
+[
+	object,
+	uuid(5155FDA0-6464-45EE-9E72-059955D98712),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IDEM : IDispatch{
+	[id(1)] HRESULT GetCellSize([out] DOUBLE* pXCellSize, [out] DOUBLE* pYCellSize);
+	[id(2)] HRESULT GetRange([out] DOUBLE* pLBX, [out] DOUBLE* pLBY, [out] DOUBLE* pRTX, [out] DOUBLE* pRTY);
+	[id(3)] HRESULT GetTIN([in] DWORD ppTriangulateio);
+	[id(4)] HRESULT Close(void);
+	[id(5)] HRESULT GetSupExts([out] BYTE* lpszExts, [in] UINT accMode);
+	[id(6)] HRESULT GetSupFormats([out] BYTE* lpszFormats, [in] UINT accMode);
+	[id(7)] HRESULT GetIImage([out] IImage** ppIImage);
+	[id(8)] HRESULT GetVertex([out] DOUBLE* pX, [out] DOUBLE* pY, [out] DOUBLE* pZ, [out] int* pVertexNum);
+	[id(9)] HRESULT GetTriangle(int nTriIndex, DOUBLE* pX, DOUBLE* pY, DOUBLE* pZ);
+	[id(10)] HRESULT GetTriangleNum([out] int* pTriangleNum);
+	[id(11)] HRESULT ConstrustTIN(void);
+	[id(12)] HRESULT GetAverageAltitude([out] DOUBLE* pZ);
+	[id(13)] HRESULT GetAltitude([in] DOUBLE X, [in] DOUBLE Y, [out] DOUBLE* pZ, [in] UINT uResampleMethod);
+	[id(14)] HRESULT Create([in] BSTR bstrPathName, [in] BSTR bstrFormat, [in] UINT accMode, [in] int nRows, [in] int nCols, [in] DOUBLE LBX, [in] DOUBLE LBY, [in] DOUBLE XCellSize, [in] DOUBLE YCellSize);
+	[id(15)] HRESULT Open([in] BSTR bstrPathName, [in] DOUBLE lfAltitudeOffset, [in] UINT accMode);
+	[id(16)] HRESULT GetMaxAltitude([out] DOUBLE* pZ);
+	[id(17)] HRESULT GetMinAltitude([out] DOUBLE* pZ);
+	[id(18)] HRESULT GetType([out] UINT* pType);
+	[id(19)] HRESULT GetRows([out] int* pRows);
+	[id(20)] HRESULT GetCols([out] int* pCols);
+	[id(21)] HRESULT GetStartPos([out] DOUBLE* pX0, [out] DOUBLE* pY0);
+	[id(22)] HRESULT GetAltitudeValues([out] DOUBLE* pZ);
+	[id(23)] HRESULT IsSupported([in] BSTR bstrPathName, [in] UINT accMode);
+	[id(24)] HRESULT ExportTin([in] BSTR bstrTinFile);
+	[id(25)] HRESULT TIN2DEM([in] BSTR bstrDEMFile, [in] DOUBLE LBX, [in] DOUBLE LBY, [in] DOUBLE RTX, [in] DOUBLE RTY, [in] DOUBLE lfCellSize);
+	[id(26)] HRESULT CreateFeatureDEM([in] BSTR bstrRasterDEMFile, [in] BSTR bstrFeatureFile, [in] DOUBLE lfBufferSize);
+	[id(27)] HRESULT SetRange([in] DOUBLE LBX, [in] DOUBLE LBY, [in] DOUBLE RTX, [in] DOUBLE RTY, [in] DOUBLE CellSize);
+	[id(28)] HRESULT SetCellSize([in] DOUBLE CellSize);
+	[id(29)] HRESULT SetFlatAltitude([in] DOUBLE Z);
+	[id(30)] HRESULT CreateFlatDEM([in] int nRows , [in] int nCols, [in]DOUBLE LBX, [in] DOUBLE LBY, [in] DOUBLE Altitude, [in] DOUBLE CellSize);
+	[id(31)] HRESULT CreateGCPDEM([in] BSTR bstrGcpFile);
+	[id(32)] HRESULT SetBufferSize([in] DOUBLE lfBufferSize);
+	[id(33)] HRESULT GetBufferSize([out] DOUBLE* pBufferSize);
+	[id(34)] HRESULT CreateVectorDEM([in] BSTR bstrVectorFile);
+};
+[
+	uuid(64801B79-246C-45C6-BBF7-5B7A9FCEA630),
+	version(1.0),
+]
+library ImageXLib
+{
+	enum  OpenFlags
+	{
+		modeRead =				0x0000,
+		modeWrite =				0x0001,
+		modeReadWrite =		    0x0002,
+		modeJpegCompress=		0x0004,
+		modePyramidCreate =		0x0100,
+		modePyramidClean =		0x0200,
+		modeAqlut =				0x0400,
+		modeEnhance =			0x000C,
+		modePyramidRead =		0x0800,
+		shareCompat =			0x0000,
+		shareExclusive =		0x0010,
+		shareDenyWrite =		0x0020,
+		shareDenyRead =			0x0030,
+		shareDenyNone =			0x0040,
+		modeNoInherit =			0x0080,
+		modeCreate =			0x1000,
+		modeNoTruncate =		0x2000,
+		modePropertyOnly =		0x4000,
+		modeDemHeaderOnly=		0x8000
+	};
+
+	enum Altitude
+	{
+		INVALID_ALTITUDE = -99999
+	};
+
+	enum DEMType
+	{
+		DT_GRID = 0,
+		DT_TIN = 1
+	};
+
+	typedef enum
+	{
+		BIP,
+		BIL,
+		BSQ
+	} BandFormat;
+
+	typedef enum
+	{
+		Intel,
+		IEEE
+	}ByteOrder;
+
+	typedef enum
+	{
+		Pixel_Byte,
+		Pixel_Int16,
+		Pixel_SInt16,
+		Pixel_Int32,
+		Pixel_SInt32,
+		Pixel_Float,
+		Pixel_Double, 
+		Pixel_Int64,
+		Pixel_SInt64
+	}DataType;
+
+	importlib("stdole2.tlb");
+	[
+		uuid(80F68129-5A4C-48EF-9949-61466CC456B2)		
+	]
+	coclass ImageDriver
+	{
+		[default] interface IImage;
+	};
+	[
+		uuid(B2789850-0375-44A1-920E-C1919F0C1A42)		
+	]
+	coclass DEMDriver
+	{
+		[default] interface IDEM;
+	};
+};
+
