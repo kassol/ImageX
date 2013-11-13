@@ -25,3 +25,5 @@ ipch/
 ImageX/ImageX_i.c
 ImageX/ImageX_i.h
 ImageX/ImageX_p.c
+Debug/ImageX.dll
+Release/ImageX.dll
