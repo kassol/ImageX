@@ -159,7 +159,7 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 		{
 			if(fopen_s(&stream, strLutPath.LockBuffer(), "rt") == 0)
 			{
-				fread(m_plut, sizeof(BYTE), 65535, stream);
+				fread(m_plut, sizeof(BYTE), 65536, stream);
 			}
 			fclose(stream);
 		}
