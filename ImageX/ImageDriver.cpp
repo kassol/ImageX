@@ -149,7 +149,11 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 	}
 	if (m_bTranto8bit)
 	{
-		m_plut = new BYTE[65536];
+		m_plut = new BYTE*[m_nBandNum];
+		for (int nb = 0; nb < m_nBandNum; ++nb)
+		{
+			m_plut[nb] = new BYTE[65536];
+		}
 		m_nOldBytesPerBand = m_nBytesPerBand;
 		m_nBytesPerBand = 1;
 		WaitForSingleObject(hmutex2, INFINITE);
@@ -159,7 +163,10 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 		{
 			if(fopen_s(&stream, strLutPath.LockBuffer(), "rt") == 0)
 			{
-				fread(m_plut, sizeof(BYTE), 65535, stream);
+				for (int nb = 0; nb < m_nBandNum; ++nb)
+				{
+					fread(m_plut[nb], sizeof(BYTE), 65536, stream);
+				}
 			}
 			fclose(stream);
 		}
@@ -182,36 +189,62 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 					int nodata = (int)m_poDataset->GetRasterBand(1)->GetNoDataValue();
 					delete []bandmap;
 					bandmap = NULL;
-					int min = 0;
-					int max = 0;
-					for (int n = 0; n < nCols*nRows*m_nBandNum; ++n)
+					double*pHistogram = new double[65536];
+					for (int nb =  0; nb < m_nBandNum; ++nb)
 					{
-						if (min == 0 || (pOverview[n] < min && pOverview[n] != nodata))
+						memset(pHistogram, 0, sizeof(double)*65536);
+						for (int n = nb; n < nCols*nRows*m_nBandNum; n += m_nBandNum)
 						{
-							min = pOverview[n];
+							pHistogram[pOverview[n]]++;
 						}
-						if (max == 0 || (pOverview[n] > max && pOverview[n] != nodata))
+						double SamplesOfPixel = 0;
+						for (int n = 1; n < 65535; ++n)
 						{
-							max =pOverview[n];
+							SamplesOfPixel += pHistogram[n];
+						}
+						double noiseLimit = 0.0001, noise = 0, lfNoiseLimit = 0.001;
+						int nBandMin = 0, nBandMax = 65535;
+						for (int n = 1; n < 65535; ++n)
+						{
+							noise += pHistogram[n];
+							if (noise/SamplesOfPixel > noiseLimit)
+							{
+								nBandMin = n;
+								break;
+							}
+						}
+						
+						noise = 0;
+						for (int n = 65534; n >= 1; --n)
+						{
+							noise += pHistogram[n];
+							if (noise/SamplesOfPixel > lfNoiseLimit)
+							{
+								nBandMax = n;
+								break;
+							}
+						}
+						for (int n = 0; n <= 65535; ++n)
+						{
+							double temp = double(n-nBandMin)/(nBandMax-nBandMin)*255+0.5;
+							if (temp > 255)
+							{
+								m_plut[nb][n] = 255;
+							}
+							else if (temp < 0)
+							{
+								m_plut[nb][n] = 0;
+							}
+							else
+							{
+								m_plut[nb][n] = (BYTE)temp;
+							}
 						}
 					}
+					delete []pHistogram;
+					pHistogram = NULL;
 					delete []pOverview;
 					pOverview = NULL;
-					for (int n = 0; n < 65536; ++n)
-					{
-						if (n < min)
-						{
-							m_plut[n] = 0;
-						}
-						else if (n < max)
-						{
-							m_plut[n] = (int)((n-min)*(255/double(max-min)));
-						}
-						else
-						{
-							m_plut[n] = 255;
-						}
-					}
 					break;
 				}
 			case Pixel_SInt16:
@@ -226,42 +259,71 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 					int nodata = (int)m_poDataset->GetRasterBand(1)->GetNoDataValue();
 					delete []bandmap;
 					bandmap = NULL;
-					int min = 0;
-					int max = 0;
-					for (int n = 0; n < nCols*nRows*m_nBandNum; ++n)
+					double*pHistogram = new double[65536];
+					for (int nb =  0; nb < m_nBandNum; ++nb)
 					{
-						if (min == 0 || (pOverview[n] < min && pOverview[n] != nodata))
+						memset(pHistogram, 0, sizeof(double)*65536);
+						for (int n = nb; n < nCols*nRows*m_nBandNum; n += m_nBandNum)
 						{
-							min = pOverview[n];
+							pHistogram[pOverview[n]]++;
 						}
-						if (max == 0 || (pOverview[n] > max && pOverview[n] != nodata))
+						double SamplesOfPixel = 0;
+						for (int n = 1; n < 65535; ++n)
 						{
-							max =pOverview[n];
+							SamplesOfPixel += pHistogram[n];
+						}
+						double noiseLimit = 0.0001, noise = 0, lfNoiseLimit = 0.001;
+						int nBandMin = 0, nBandMax = 65535;
+						for (int n = 1; n < 65535; ++n)
+						{
+							noise += pHistogram[n];
+							if (noise/SamplesOfPixel > noiseLimit)
+							{
+								nBandMin = n;
+								break;
+							}
+						}
+
+						noise = 0;
+						for (int n = 65534; n >= 1; --n)
+						{
+							noise += pHistogram[n];
+							if (noise/SamplesOfPixel > lfNoiseLimit)
+							{
+								nBandMax = n;
+								break;
+							}
+						}
+						for (int n = 0; n <= 65535; ++n)
+						{
+							double temp = double(n-nBandMin)/(nBandMax-nBandMin)*255+0.5;
+							if (temp > 255)
+							{
+								m_plut[nb][n] = 255;
+							}
+							else if (temp < 0)
+							{
+								m_plut[nb][n] = 0;
+							}
+							else
+							{
+								m_plut[nb][n] = (BYTE)temp;
+							}
 						}
 					}
+					delete []pHistogram;
+					pHistogram = NULL;
 					delete []pOverview;
 					pOverview = NULL;
-					for (int n = 0; n < 65536; ++n)
-					{
-						if (n < min)
-						{
-							m_plut[n] = 0;
-						}
-						else if (n < max)
-						{
-							m_plut[n] = (int)((n-min)*(255/(double)(max-min)));
-						}
-						else
-						{
-							m_plut[n] = 0;
-						}
-					}
 					break;
 				}
 			}
 			if(fopen_s(&stream, strLutPath.LockBuffer(), "wt") == 0)
 			{
-				fwrite(m_plut, sizeof(BYTE), 65536, stream);
+				for (int nb = 0; nb < m_nBandNum; ++nb)
+				{
+					fwrite(m_plut[nb], sizeof(BYTE), 65536, stream);
+				}
 			}
 			fclose(stream);
 		}
@@ -654,6 +716,11 @@ STDMETHODIMP CImageDriver::Close(void)
 	}
 	if (m_bTranto8bit)
 	{
+		for (int nb = 0; nb < m_nBandNum; ++nb)
+		{
+			delete [](m_plut[nb]);
+			m_plut[nb] = NULL;
+		}
 		delete []m_plut;
 		m_plut = NULL;
 	}
@@ -1136,9 +1203,10 @@ STDMETHODIMP CImageDriver::ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int
 					{
 						for (int i = nDestLeft; i < nDestRight; ++i)
 						{
-							pBuf[j*nBufWid*nBandNum+i*nBandNum] = m_plut[pp[j*nBufWid*nBandNum+i*nBandNum]];
-							pBuf[j*nBufWid*nBandNum+i*nBandNum+1] = m_plut[pp[j*nBufWid*nBandNum+i*nBandNum+1]];
-							pBuf[j*nBufWid*nBandNum+i*nBandNum+2] = m_plut[pp[j*nBufWid*nBandNum+i*nBandNum+2]];
+							for (int nb = 0; nb < nBandNum; ++nb)
+							{
+								pBuf[j*nBufWid*nBandNum+i*nBandNum+nb] = m_plut[nb][pp[j*nBufWid*nBandNum+i*nBandNum+nb]];
+							}
 						}
 					}
 					break;
@@ -1150,9 +1218,10 @@ STDMETHODIMP CImageDriver::ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int
 					{
 						for (int i = nDestLeft; i < nDestRight; ++i)
 						{
-							pBuf[j*nBufWid*nBandNum+i*nBandNum] = m_plut[pp[j*nBufWid*nBandNum+i*nBandNum]];
-							pBuf[j*nBufWid*nBandNum+i*nBandNum+1] = m_plut[pp[j*nBufWid*nBandNum+i*nBandNum+1]];
-							pBuf[j*nBufWid*nBandNum+i*nBandNum+2] = m_plut[pp[j*nBufWid*nBandNum+i*nBandNum+2]];
+							for (int nb = 0; nb < m_nBandNum; ++nb)
+							{
+								pBuf[j*nBufWid*nBandNum+i*nBandNum+nb] = m_plut[nb][pp[j*nBufWid*nBandNum+i*nBandNum+nb]];
+							}
 						}
 					}
 					break;
@@ -1188,7 +1257,7 @@ STDMETHODIMP CImageDriver::ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int
 					{
 						for(int i = nDestLeft; i < nDestRight; ++i)
 						{
-							pBuf[j*nBufWid*nBandNum+i*nBandNum+nDestSkip] = m_plut[pp[j*nBufWid+i]];
+							pBuf[j*nBufWid*nBandNum+i*nBandNum+nDestSkip] = m_plut[nSrcSkip][pp[j*nBufWid+i]];
 						}
 					}
 					break;
@@ -1200,7 +1269,7 @@ STDMETHODIMP CImageDriver::ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int
 					{
 						for(int i = nDestLeft; i < nDestRight; ++i)
 						{
-							pBuf[j*nBufWid*nBandNum+i*nBandNum+nDestSkip] = m_plut[pp[j*nBufWid+i]];
+							pBuf[j*nBufWid*nBandNum+i*nBandNum+nDestSkip] = m_plut[nSrcSkip][pp[j*nBufWid+i]];
 						}
 					}
 					break;

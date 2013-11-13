@@ -37,6 +37,7 @@ public:
 		, m_lfyStart(0)
 		, m_lfCellsize(0)
 		, m_uMode(0)
+		, m_plut(NULL)
 	{
 	}
 
@@ -130,7 +131,7 @@ private:
 	float m_fyDPI;
 	float m_fResolution, m_fXResolution, m_fYResolution;
 	bool m_bTranto8bit;
-	BYTE* m_plut;
+	BYTE** m_plut;
 public:
 	STDMETHOD(Tiff2JPG)(BSTR bstrTiffPath, BSTR bstrJPGPath);
 };
