@@ -298,7 +298,14 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 		}
 		else
 		{
-			m_bIsGeoCoded = false;
+			if (m_poDataset->GetGeoTransform(m_pGeoTrans) == CE_None)
+			{
+				m_bIsGeoCoded = true;
+			}
+			else
+			{
+				m_bIsGeoCoded = false;
+			}
 		}
 		infile.clear();
 		infile.close();
