@@ -677,7 +677,15 @@ STDMETHODIMP CImageDriver::GetBandFormat(UINT* pBandFormat)
 {
 	// TODO: Add your implementation code here
 	char** pszMetaData = m_poDataset->GetMetadata("IMAGE_STRUCTURE");
+	if (pszMetaData == NULL)
+	{
+		return S_FALSE;
+	}
 	const char* pszBand = CSLFetchNameValue(pszMetaData, "INTERLEAVE");
+	if (pszBand == NULL)
+	{
+		return S_FALSE;
+	}
 	if (strcmp(pszBand, "LINE") == 0)
 	{
 		*pBandFormat = BIL;
