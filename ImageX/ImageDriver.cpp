@@ -157,7 +157,7 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 		CString strLutPath = strPathName + _T(".lut");
 		if (_access(strLutPath, 0) != -1)
 		{
-			if(fopen_s(&stream, strLutPath.LockBuffer(), "rt") == 0)
+			if(fopen_s(&stream, strLutPath.LockBuffer(), "rb") == 0)
 			{
 				fread(m_plut, sizeof(BYTE), 65536*m_nBandNum, stream);
 			}
@@ -311,7 +311,7 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 					break;
 				}
 			}
-			if(fopen_s(&stream, strLutPath.LockBuffer(), "wt") == 0)
+			if(fopen_s(&stream, strLutPath.LockBuffer(), "wb") == 0)
 			{
 				fwrite(m_plut, sizeof(BYTE), 65536*m_nBandNum, stream);
 			}
