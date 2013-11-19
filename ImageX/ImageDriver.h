@@ -37,6 +37,7 @@ public:
 		, m_lfyStart(0)
 		, m_lfCellsize(0)
 		, m_uMode(0)
+		, m_plut(NULL)
 	{
 	}
 
