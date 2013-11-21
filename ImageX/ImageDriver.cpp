@@ -91,7 +91,14 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 		m_poDataset = (GDALDataset*)GDALOpen( m_strPathName, GA_ReadOnly);
 	}
 	else
+	{
 		return S_FALSE;
+	}
+
+	if (m_poDataset == NULL)
+	{
+		return S_FALSE;
+	}
 
 
 	m_nWidth = m_poDataset->GetRasterXSize();
@@ -178,7 +185,10 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 					{
 						bandmap[i] = i+1;
 					}
-					m_poDataset->RasterIO(GF_Read, 0, 0, m_nWidth, m_nHeight, pOverview, nCols, nRows, m_eGDALType, m_nBandNum, bandmap, 0, 0, 0);
+					if (CE_Failure == m_poDataset->RasterIO(GF_Read, 0, 0, m_nWidth, m_nHeight, pOverview, nCols, nRows, m_eGDALType, m_nBandNum, bandmap, 0, 0, 0))
+					{
+						return S_FALSE;
+					}
 					int nodata = (int)m_poDataset->GetRasterBand(1)->GetNoDataValue();
 					delete []bandmap;
 					bandmap = NULL;
@@ -248,7 +258,10 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 					{
 						bandmap[i] = i+1;
 					}
-					m_poDataset->RasterIO(GF_Read, 0, 0, m_nWidth, m_nHeight, pOverview, nCols, nRows, m_eGDALType, m_nBandNum, bandmap, 0, 0, 0);
+					if (CE_Failure == m_poDataset->RasterIO(GF_Read, 0, 0, m_nWidth, m_nHeight, pOverview, nCols, nRows, m_eGDALType, m_nBandNum, bandmap, 0, 0, 0))
+					{
+						return S_FALSE;
+					}
 					int nodata = (int)m_poDataset->GetRasterBand(1)->GetNoDataValue();
 					delete []bandmap;
 					bandmap = NULL;
@@ -425,7 +438,10 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 
 	if ((uMode & modePyramidClean) == modePyramidClean)
 	{
-		GDALBuildOverviews( (GDALDatasetH)m_poDataset, pszResampling, 0, 0, 0, NULL, NULL, NULL );
+		if (CE_Failure == m_poDataset->BuildOverviews(pszResampling, 0, 0, 0, NULL, NULL, NULL))
+		{
+			return S_FALSE;
+		}
 	}
 
 	if ((uMode & modePyramidCreate) == modePyramidCreate)
@@ -449,7 +465,10 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 			}
 			++i;
 		}
-		GDALBuildOverviews((GDALDatasetH)m_poDataset, pszResampling, nLevelCount, pOverviewList, 0, NULL, NULL, NULL);
+		if (CE_Failure == m_poDataset->BuildOverviews(pszResampling, nLevelCount, pOverviewList, 0, NULL, NULL, NULL))
+		{
+			return S_FALSE;
+		}
 	}
 	
 	return S_OK;
@@ -514,6 +533,10 @@ STDMETHODIMP CImageDriver::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, in
 		return S_FALSE;
 	}
 	char** ppszMetaData = poDriver->GetMetadata();
+	if (ppszMetaData == NULL)
+	{
+		return S_FALSE;
+	}
 	if ( CSLFetchBoolean( ppszMetaData, GDAL_DCAP_CREATE, FALSE ) != TRUE && CSLFetchBoolean(ppszMetaData, GDAL_DCAP_CREATECOPY, FALSE) != TRUE)
 	{
 		return S_FALSE;
@@ -616,6 +639,10 @@ STDMETHODIMP CImageDriver::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, in
 	{
 		CString temPathName = strFilePath.Left(strFilePath.ReverseFind('.'))+_T("_temp.tif");
 		GDALDriver *tempoDriver = GetGDALDriverManager()->GetDriverByName("GTIFF");
+		if (tempoDriver == NULL)
+		{
+			return S_FALSE;
+		}
 		m_poDataset = tempoDriver->Create(temPathName.LockBuffer(), Cols, Rows, nBandNum, m_eGDALType, ppszOptions);
 	}
 	else
@@ -672,7 +699,10 @@ STDMETHODIMP CImageDriver::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, in
 	{
 		for (int n = 0; n < m_nBandNum; ++n)
 		{
-			m_poDataset->GetRasterBand(n+1)->Fill(0);
+			if(CE_Failure == m_poDataset->GetRasterBand(n+1)->Fill(0))
+			{
+				return 0;
+			}
 		}
 	}
 	return S_OK;
@@ -689,7 +719,15 @@ STDMETHODIMP CImageDriver::Close(void)
 		if ((m_uMode&modeCreate) == modeCreate)
 		{
 			GDALDriver* tempoDriver = GetGDALDriverManager()->GetDriverByName("JPEG");
+			if (tempoDriver == NULL)
+			{
+				return S_FALSE;
+			}
 			GDALDataset* tempoDataset = tempoDriver->CreateCopy(m_strPathName, m_poDataset, TRUE, NULL, NULL, NULL);
+			if (tempoDataset = NULL)
+			{
+				return FALSE;
+			}
 			GDALClose((GDALDatasetH)tempoDataset);
 			GDALClose((GDALDatasetH)m_poDataset);
 			CString temPathName = strPathName.Left(strPathName.ReverseFind('.'))+_T("_temp.tif");
@@ -976,7 +1014,10 @@ STDMETHODIMP CImageDriver::GetPixel(int nRows, int nCols, BYTE* pPixel)
 		return S_FALSE;
 	}
 	BYTE* pTmpPixel = (BYTE*)calloc(m_nBandNum,m_nBytesPerBand);
-	m_poDataset->RasterIO(GF_Read, nCols, nRows, 1, 1, pTmpPixel, 1, 1, m_eGDALType, m_nBandNum, NULL, 0, 0, 0);
+	if (CE_Failure == m_poDataset->RasterIO(GF_Read, nCols, nRows, 1, 1, pTmpPixel, 1, 1, m_eGDALType, m_nBandNum, NULL, 0, 0, 0))
+	{
+		return S_FALSE;
+	}
 	memcpy(pPixel,pTmpPixel,m_nBandNum*m_nBytesPerBand*sizeof(BYTE));
 	free( pTmpPixel );
 	pTmpPixel = NULL;
@@ -987,7 +1028,10 @@ STDMETHODIMP CImageDriver::GetPixel(int nRows, int nCols, BYTE* pPixel)
 STDMETHODIMP CImageDriver::SetPixel(int nRows, int nCols, BYTE* pPixel)
 {
 	// TODO: Add your implementation code here
-	m_poDataset->RasterIO(GF_Write, nCols, nRows, 1, 1, pPixel, 1, 1, m_eGDALType, m_nBandNum, NULL, 0, 0, 0);
+	if (CE_Failure == m_poDataset->RasterIO(GF_Write, nCols, nRows, 1, 1, pPixel, 1, 1, m_eGDALType, m_nBandNum, NULL, 0, 0, 0))
+	{
+		return S_FALSE;
+	}
 	return S_OK;
 }
 
@@ -997,7 +1041,10 @@ STDMETHODIMP CImageDriver::GetGray(int nRows, int nCols, int nBand, BYTE* gray)
 	// TODO: Add your implementation code here
 	BYTE *pTmpData = new BYTE[m_nBPB];
 	memset( pTmpData, 0, m_nBPB);
-	m_poDataset->GetRasterBand(nBand+1)->RasterIO(GF_Read,nCols,nRows,1,1,pTmpData,1,1,m_eGDALType,0,0);
+	if (CE_Failure == m_poDataset->GetRasterBand(nBand+1)->RasterIO(GF_Read,nCols,nRows,1,1,pTmpData,1,1,m_eGDALType,0,0))
+	{
+		return S_FALSE;
+	}
 	memcpy( gray, pTmpData, m_nBPB);
 	delete[] pTmpData;
 	pTmpData = NULL;
@@ -1008,7 +1055,10 @@ STDMETHODIMP CImageDriver::GetGray(int nRows, int nCols, int nBand, BYTE* gray)
 STDMETHODIMP CImageDriver::SetGray(int nRows, int nCols, int nBand, BYTE* gray)
 {
 	// TODO: Add your implementation code here
-	m_poDataset->GetRasterBand(nBand+1)->RasterIO(GF_Read,nCols,nRows,1,1,gray,1,1,m_eGDALType,0,0);
+	if (CE_Failure == m_poDataset->GetRasterBand(nBand+1)->RasterIO(GF_Read,nCols,nRows,1,1,gray,1,1,m_eGDALType,0,0))
+	{
+		return S_FALSE;
+	}
 	return S_OK;
 }
 
@@ -1169,16 +1219,24 @@ STDMETHODIMP CImageDriver::ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int
 		}
 		if (!m_bTranto8bit)
 		{
-			m_poDataset->RasterIO(GF_Read, nSrcLeft, m_nHeight - nSrcBottom, nSrcRight - nSrcLeft, nSrcBottom - nSrcTop,
+			CPLErr er = m_poDataset->RasterIO(GF_Read, nSrcLeft, m_nHeight - nSrcBottom, nSrcRight - nSrcLeft, nSrcBottom - nSrcTop,
 				pBuf + (nDestBottom - 1) * nBufWid * m_nBPP + nDestLeft * m_nBPP, nDestRight - nDestLeft, nDestBottom - nDestTop, m_eGDALType, nBandNum, bandmap,
 				m_nBPP, -m_nBPP * nBufWid, m_nBPB);
+			if (CE_Failure == er)
+			{
+				return S_FALSE;
+			}
 		}
 		else
 		{
 			BYTE *temBuf = new BYTE[m_nOldBytesPerBand*m_nBandNum*nBufHeight*nBufWid];
-			m_poDataset->RasterIO(GF_Read, nSrcLeft, m_nHeight - nSrcBottom, nSrcRight - nSrcLeft, nSrcBottom - nSrcTop,
+			CPLErr er = m_poDataset->RasterIO(GF_Read, nSrcLeft, m_nHeight - nSrcBottom, nSrcRight - nSrcLeft, nSrcBottom - nSrcTop,
 				temBuf + (nDestBottom - 1) * nBufWid * m_nOldBytesPerBand*nBandNum + nDestLeft * m_nOldBytesPerBand*nBandNum, nDestRight - nDestLeft, nDestBottom - nDestTop, m_eGDALType, nBandNum, bandmap,
 				m_nOldBytesPerBand*nBandNum, -m_nOldBytesPerBand*nBandNum * nBufWid, m_nOldBytesPerBand*nBandNum);
+			if (CE_Failure == er)
+			{
+				return S_FALSE;
+			}
 			switch(m_nDataType)
 			{
 			case Pixel_Int16:
@@ -1223,16 +1281,24 @@ STDMETHODIMP CImageDriver::ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int
 	{
 		if (!m_bTranto8bit)
 		{
-			m_poDataset->GetRasterBand(nSrcSkip+1)->RasterIO(GF_Read, nSrcLeft, m_nHeight - nSrcBottom, nSrcRight - nSrcLeft, nSrcBottom - nSrcTop,
+			CPLErr er = m_poDataset->GetRasterBand(nSrcSkip+1)->RasterIO(GF_Read, nSrcLeft, m_nHeight - nSrcBottom, nSrcRight - nSrcLeft, nSrcBottom - nSrcTop,
 				pBuf + (nDestBottom - 1) * nBufWid * nBandNum* m_nBPB + nDestLeft * nBandNum * m_nBPB + nDestSkip * m_nBPB, nDestRight - nDestLeft, nDestBottom - nDestTop, m_eGDALType, 
 				nBandNum * m_nBPB, -nBandNum * m_nBPB * nBufWid);
+			if (CE_Failure == er)
+			{
+				return S_FALSE;
+			}
 		}
 		else
 		{
 			BYTE *temBuf = new BYTE[m_nOldBytesPerBand*nBufHeight*nBufWid];
-			m_poDataset->GetRasterBand(nSrcSkip+1)->RasterIO(GF_Read, nSrcLeft, m_nHeight - nSrcBottom, nSrcRight - nSrcLeft, nSrcBottom - nSrcTop,
+			CPLErr er = m_poDataset->GetRasterBand(nSrcSkip+1)->RasterIO(GF_Read, nSrcLeft, m_nHeight - nSrcBottom, nSrcRight - nSrcLeft, nSrcBottom - nSrcTop,
 				temBuf + (nDestBottom - 1) * nBufWid * m_nOldBytesPerBand + nDestLeft * m_nOldBytesPerBand, nDestRight - nDestLeft, nDestBottom - nDestTop, m_eGDALType, 
 				m_nOldBytesPerBand, -m_nOldBytesPerBand * nBufWid);
+			if (CE_Failure == er)
+			{
+				return S_FALSE;
+			}
 			switch(m_nDataType)
 			{
 			case Pixel_Int16:
@@ -1323,9 +1389,13 @@ STDMETHODIMP CImageDriver::WriteImg(int nSrcLeft, int nSrcTop, int nSrcRight, in
 			bandmap[i] = i+1;
 		}
 
-		m_poDataset->RasterIO(GF_Write, nSrcLeft, m_nHeight - nSrcBottom, nSrcRight - nSrcLeft, nSrcBottom - nSrcTop,
+		CPLErr er = m_poDataset->RasterIO(GF_Write, nSrcLeft, m_nHeight - nSrcBottom, nSrcRight - nSrcLeft, nSrcBottom - nSrcTop,
 			pBuf + (nDestBottom - 1) * nBufWid * m_nBPP + nDestLeft * m_nBPP, nDestRight - nDestLeft, nDestBottom - nDestTop, m_eGDALType, nBandNum, bandmap,
 			m_nBPP, -m_nBPP * nBufWid, m_nBPB);
+		if (CE_Failure == er)
+		{
+			return S_FALSE;
+		}
 
 		delete [] bandmap;
 		bandmap = NULL;
@@ -1333,9 +1403,13 @@ STDMETHODIMP CImageDriver::WriteImg(int nSrcLeft, int nSrcTop, int nSrcRight, in
 	}
 	else
 	{
-		m_poDataset->GetRasterBand(nSrcSkip+1)->RasterIO(GF_Write, nSrcLeft, m_nHeight-nSrcBottom, nSrcRight-nSrcLeft, nSrcBottom-nSrcTop,
+		CPLErr er = m_poDataset->GetRasterBand(nSrcSkip+1)->RasterIO(GF_Write, nSrcLeft, m_nHeight-nSrcBottom, nSrcRight-nSrcLeft, nSrcBottom-nSrcTop,
 			pBuf + (nDestBottom - 1) * nBufWid * nBandNum * m_nBPB + nDestLeft * nBandNum * m_nBPB+nDestSkip*m_nBPB, nDestRight-nDestLeft, nDestBottom-nDestTop, m_eGDALType, 
 			nBandNum*m_nBPB, -nBandNum*m_nBPB*nBufWid);
+		if (CE_Failure == er)
+		{
+			return S_FALSE;
+		}
 	}
 	return S_OK;
 }
@@ -1444,6 +1518,10 @@ STDMETHODIMP CImageDriver::SetDPI(FLOAT xDPI, FLOAT yDPI)
 {
 	// TODO: Add your implementation code here
 	char **pszMetadata = m_poDataset->GetMetadata();
+	if (pszMetadata == NULL)
+	{
+		return S_FALSE;
+	}
 	char *p = new char[20];
 	sprintf(p, "%s", "2 (pixels/inch)");
 	pszMetadata = CSLSetNameValue(pszMetadata, "TIFFTAG_RESOLUTIONUNIT", p);
@@ -1453,7 +1531,11 @@ STDMETHODIMP CImageDriver::SetDPI(FLOAT xDPI, FLOAT yDPI)
 	char *ydpi = new char[20];
 	sprintf(ydpi, "%f", yDPI);
 	pszMetadata = CSLSetNameValue(pszMetadata, "TIFFTAG_YRESOLUTION", ydpi);
-	m_poDataset->SetMetadata(pszMetadata);
+	CPLErr er = m_poDataset->SetMetadata(pszMetadata);
+	if (CE_Failure == er)
+	{
+		return S_FALSE;
+	}
 	delete []p;
 	delete []xdpi;
 	delete []ydpi;
@@ -1474,8 +1556,16 @@ STDMETHODIMP CImageDriver::Tiff2JPG(BSTR bstrTiffPath, BSTR bstrJPGPath)
 	CString strTiffPath = bstrTiffName;
 	CString strJPGPath = bstrJPGName;
 	m_poDataset  = (GDALDataset*)GDALOpen( strTiffPath, GA_ReadOnly);
+	if (m_poDataset == NULL)
+	{
+		return S_FALSE;
+	}
 	GDALDriver* tempoDriver = GetGDALDriverManager()->GetDriverByName("JPEG");
 	GDALDataset* tempoDataset = tempoDriver->CreateCopy(strJPGPath, m_poDataset, TRUE, NULL, NULL, NULL);
+	if (tempoDataset == NULL)
+	{
+		return S_FALSE;
+	}
 	GDALClose((GDALDatasetH)tempoDataset);
 	return S_OK;
 }
