@@ -60,6 +60,7 @@ interface IImage : IDispatch{
 	[id(51), helpstring("GetDPI")] HRESULT GetDPI([out] FLOAT* pxDPI, [out] FLOAT* pyDPI);
 	[id(52), helpstring("SetDPI")] HRESULT SetDPI([in] FLOAT xDPI, [in] FLOAT yDPI);
 	[id(53)] HRESULT Tiff2JPG([in] BSTR bstrTiffPath, [in] BSTR bstrJPGPath);
+	[id(54), helpstring("GetTiledSize")] HRESULT GetTiledSize([out] int* nXBlockSize, [out] int* nYBlockSize);
 };
 [
 	object,

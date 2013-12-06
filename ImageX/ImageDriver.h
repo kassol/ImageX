@@ -107,6 +107,8 @@ public:
 	STDMETHOD(SetSensorType)(int nSensorType);
 	STDMETHOD(GetDPI)(FLOAT* pxDPI, FLOAT* pyDPI);
 	STDMETHOD(SetDPI)(FLOAT xDPI, FLOAT yDPI);
+	STDMETHOD(Tiff2JPG)(BSTR bstrTiffPath, BSTR bstrJPGPath);
+	STDMETHOD(GetTiledSize)(int* nXBlockSize, int* nYBlockSize);
 
 private:
 	GDALDataset* m_poDataset;
@@ -132,8 +134,6 @@ private:
 	float m_fResolution, m_fXResolution, m_fYResolution;
 	bool m_bTranto8bit;
 	BYTE* m_plut;
-public:
-	STDMETHOD(Tiff2JPG)(BSTR bstrTiffPath, BSTR bstrJPGPath);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ImageDriver), CImageDriver)

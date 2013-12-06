@@ -1569,3 +1569,13 @@ STDMETHODIMP CImageDriver::Tiff2JPG(BSTR bstrTiffPath, BSTR bstrJPGPath)
 	GDALClose((GDALDatasetH)tempoDataset);
 	return S_OK;
 }
+
+
+STDMETHODIMP CImageDriver::GetTiledSize(int* nXBlockSize, int* nYBlockSize)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	// TODO: Add your implementation code here
+	m_poDataset->GetRasterBand(1)->GetBlockSize(nXBlockSize, nYBlockSize);
+	return S_OK;
+}
