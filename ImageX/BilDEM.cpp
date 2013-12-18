@@ -39,7 +39,7 @@ HRESULT CBilDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMode)
 		Close();
 	}
 
-	HRESULT hRes=CoCreateInstance(CLSID_ImageDriver,NULL,CLSCTX_ALL,IID_IImage,(void**)&m_pImage);
+	HRESULT hRes=CoCreateInstance(CLSID_ImageDriverX,NULL,CLSCTX_ALL,IID_IImageX,(void**)&m_pImage);
 	if(FAILED(hRes))
 	{
 		AfxMessageBox(IDS_IMGDRIVER_FAIL);
@@ -271,7 +271,7 @@ HRESULT CBilDEM::GetSupFormats(BYTE* lpszFormats, UINT accMode)
 	return S_OK;
 }
 
-HRESULT CBilDEM::GetIImage(IImage** ppIImage)
+HRESULT CBilDEM::GetIImage(IImageX** ppIImage)
 {
 	if(ppIImage==NULL)
 	{

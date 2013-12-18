@@ -13,7 +13,7 @@
 #include "RealRgn.h"
 
 
-interface IImage;
+interface IImageX;
 
 
 //#define INVALID_ALTITUDE	-99999.9
@@ -30,7 +30,7 @@ public:
 	virtual HRESULT Close(void) = 0;
 	HRESULT GetSupExts(BYTE* lpszExts, UINT accMode);
 	virtual HRESULT GetSupFormats(BYTE* lpszFormats, UINT accMode) = 0;
-	virtual HRESULT GetIImage(IImage** ppIImage) = 0;
+	virtual HRESULT GetIImage(IImageX** ppIImage) = 0;
 	virtual HRESULT GetVertex(double* pX, double* pY, double* pZ, int* pVertexNum) = 0;
 	virtual HRESULT GetTriangle(int nTriIndex, double* pX, double* pY, double* pZ) = 0;
 	virtual HRESULT GetTriangleNum(int* pTriangleNum) = 0;
@@ -78,7 +78,7 @@ protected:
 	double m_X0,m_Y0,m_XCellSize,m_YCellSize,m_Kappa;
 	int m_nRows,m_nCols;
 	double m_AveAltitude,m_MaxAltitude,m_MinAltitude;
-	 IImage* m_pImage;//DEM影像
+	 IImageX* m_pImage;//DEM影像
 	CString m_strDemImage;//DEM影像名称
 	triangulateio in,mid,vorout;
 	double m_lfAltitudeOffset;

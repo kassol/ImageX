@@ -17,8 +17,8 @@ using namespace ATL;
 
 class ATL_NO_VTABLE CImageDriver :
 	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CImageDriver, &CLSID_ImageDriver>,
-	public IDispatchImpl<IImage, &IID_IImage, &LIBID_ImageXLib, /*wMajor =*/ 1, /*wMinor =*/ 0>
+	public CComCoClass<CImageDriver, &CLSID_ImageDriverX>,
+	public IDispatchImpl<IImageX, &IID_IImageX, &LIBID_ImageXLib, /*wMajor =*/ 1, /*wMinor =*/ 0>
 {
 public:
 	CImageDriver()
@@ -45,7 +45,7 @@ DECLARE_REGISTRY_RESOURCEID(IDR_IMAGEDRIVER)
 
 
 BEGIN_COM_MAP(CImageDriver)
-	COM_INTERFACE_ENTRY(IImage)
+	COM_INTERFACE_ENTRY(IImageX)
 	COM_INTERFACE_ENTRY(IDispatch)
 END_COM_MAP()
 
@@ -136,4 +136,4 @@ private:
 	BYTE* m_plut;
 };
 
-OBJECT_ENTRY_AUTO(__uuidof(ImageDriver), CImageDriver)
+OBJECT_ENTRY_AUTO(__uuidof(ImageDriverX), CImageDriver)

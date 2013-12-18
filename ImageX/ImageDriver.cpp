@@ -82,6 +82,7 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 		CString strImgPath;
 		getline(srcSat, temp);
 		strImgPath = m_strPathName.Left(m_strPathName.ReverseFind('\\'))+temp.c_str();
+		CString strFindPath = strImgPath.Left(strImgPath.ReverseFind('\\'))+_T("\\*.*");
 		m_poDataset = (GDALDataset*)GDALOpen(strImgPath.GetBuffer(0), GA_ReadOnly);
 		if (m_poDataset == NULL)
 		{
@@ -145,6 +146,70 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 		m_nBPB = m_nBytesPerBand;
 		m_nBPP = m_nBandNum * m_nBPB;
 		srcSat.close();
+
+		
+		CFileFind find;
+		BOOL bf = find.FindFile(strFindPath);
+		CString strTILPathName;
+		bool bHasTIL = false;
+		while (bf)
+		{
+			bf = find.FindNextFile();
+			strTILPathName = find.GetFilePath();
+			if (strTILPathName.Right(3).CompareNoCase("til") == 0)
+			{
+				bHasTIL = true;
+				break;
+			}
+		}
+		if (bHasTIL)
+		{
+			ifstream til;
+			til.open(strTILPathName.GetBuffer(0), ios::in);
+			getline(til, temp);
+			getline(til, temp);
+			getline(til, temp);
+			getline(til, temp);
+			getline(til, temp);
+			getline(til, temp);
+			double tmpXStart, tmpYStart;
+			m_lfxStart = 0;
+			m_lfyStart = 0;
+			for (int i = 0; i < nTileCount; ++i)
+			{
+
+				getline(til, temp);
+				getline(til, temp);
+				temp = temp.substr(temp.find_first_of('\"')+1, temp.find_last_of('\"')-
+					temp.find_first_of('\"')-1);
+				strImgPath = strTILPathName.Left(strTILPathName.ReverseFind('\\'))+_T("\\")+temp.c_str();
+				GDALClose((GDALDatasetH)m_poDataset);
+				m_poDataset = (GDALDataset*)GDALOpen(strImgPath.GetBuffer(0), GA_ReadOnly);
+
+				m_poDataset->GetGeoTransform(m_pGeoTrans);
+				int nYSize = m_poDataset->GetRasterYSize();
+
+				m_lfCellsize = abs(m_pGeoTrans[1]);
+				tmpXStart = m_pGeoTrans[0];
+				tmpYStart = m_pGeoTrans[3]-nYSize*m_lfCellsize;
+
+				if (m_lfxStart == 0 || m_lfxStart-tmpXStart > 0.00001)
+				{
+					m_lfxStart = tmpXStart;
+				}
+				if (m_lfyStart == 0 || m_lfyStart-tmpYStart > 0.00001)
+				{
+					m_lfyStart = tmpYStart;
+				}
+
+				for (int j = 0; j < 25; ++j)
+				{
+					getline(til, temp);
+				}
+			}
+			til.close();
+		}
+
 
 		return S_OK;
 	}
@@ -1488,6 +1553,8 @@ STDMETHODIMP CImageDriver::ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int
 					{
 						return S_FALSE;
 					}
+					GDALClose((GDALDatasetH)m_poDataset);
+					m_poDataset = (GDALDataset*)GDALOpen(strImagePath.GetBuffer(0), GA_ReadOnly);
 					if (!m_bTranto8bit)
 					{
 						CPLErr er = m_poDataset->GetRasterBand(nSrcSkip+1)->RasterIO(GF_Read, nSrcLeftTmp,

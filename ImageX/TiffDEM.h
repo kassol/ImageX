@@ -17,7 +17,7 @@ public:
 	HRESULT Close(void);
 	HRESULT GetSupExts(BYTE* lpszExts, UINT accMode);
 	HRESULT GetSupFormats(BYTE* lpszFormats, UINT accMode);
-	HRESULT GetIImage(IImage** ppIImage);
+	HRESULT GetIImage(IImageX** ppIImage);
 	HRESULT GetVertex(double* pX, double* pY, double* pZ, int* pVertexNum);
 	HRESULT GetTriangle(int nTriIndex, double* pX, double* pY, double* pZ);
 	HRESULT GetTriangleNum(int* pTriangleNum);

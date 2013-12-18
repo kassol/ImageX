@@ -96,7 +96,7 @@ STDMETHODIMP CDEMDriver::GetSupFormats(BYTE* lpszFormats, UINT accMode)
 }
 
 
-STDMETHODIMP CDEMDriver::GetIImage(IImage** ppIImage)
+STDMETHODIMP CDEMDriver::GetIImage(IImageX** ppIImage)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 

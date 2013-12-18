@@ -239,7 +239,7 @@ HRESULT CArcGridDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMo
 		DeleteFile(m_strDemImage.Left(m_strDemImage.ReverseFind('.'))+".img");
 	}
 
-	HRESULT hRes=CoCreateInstance(CLSID_ImageDriver,NULL,CLSCTX_ALL,IID_IImage,(void**)&m_pImage);
+	HRESULT hRes=CoCreateInstance(CLSID_ImageDriverX,NULL,CLSCTX_ALL,IID_IImageX,(void**)&m_pImage);
 	if(FAILED(hRes))
 	{
 		AfxMessageBox(IDS_IMGDRIVER_FAIL);
@@ -339,7 +339,7 @@ HRESULT CArcGridDEM::GetSupFormats(BYTE* lpszFormats, UINT accMode)
 	return S_OK;
 }
 
-HRESULT CArcGridDEM::GetIImage(IImage** ppIImage)
+HRESULT CArcGridDEM::GetIImage(IImageX** ppIImage)
 {
 	if(ppIImage==NULL)
 	{

@@ -600,7 +600,7 @@ HRESULT CFeatureDEM::GetSupFormats(BYTE* lpszFormats, UINT accMode)
 	return S_FALSE;
 }
 
-HRESULT CFeatureDEM::GetIImage(IImage** ppIImage)
+HRESULT CFeatureDEM::GetIImage(IImageX** ppIImage)
 {
 	return S_FALSE;
 }

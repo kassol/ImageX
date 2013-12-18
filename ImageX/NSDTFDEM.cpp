@@ -90,7 +90,7 @@ HRESULT CNSDTFDEM::GetSupFormats(BYTE* lpszFormats, UINT accMode)
 }
 
 
-HRESULT CNSDTFDEM::GetIImage(IImage** ppIImage)
+HRESULT CNSDTFDEM::GetIImage(IImageX** ppIImage)
 {
 	if(ppIImage==NULL)
 	{
@@ -379,7 +379,7 @@ HRESULT CNSDTFDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMode
 		DeleteFile(m_strDemImage.Left(m_strDemImage.ReverseFind('.'))+".img");
 	}
 
-	HRESULT hRes=CoCreateInstance(CLSID_ImageDriver,NULL,CLSCTX_ALL,IID_IImage,(void**)&m_pImage);
+	HRESULT hRes=CoCreateInstance(CLSID_ImageDriverX,NULL,CLSCTX_ALL,IID_IImageX,(void**)&m_pImage);
 	if(FAILED(hRes))
 	{
 		AfxMessageBox(IDS_IMGDRIVER_FAIL);

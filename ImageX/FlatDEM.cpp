@@ -89,7 +89,7 @@ HRESULT CFlatDEM::GetSupFormats(BYTE* lpszFormats, UINT accMode)
 	return S_FALSE;
 }
 
-HRESULT CFlatDEM::GetIImage(IImage** ppIImage)
+HRESULT CFlatDEM::GetIImage(IImageX** ppIImage)
 {
 	*ppIImage=m_pImage;
 

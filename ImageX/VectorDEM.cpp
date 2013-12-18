@@ -38,7 +38,7 @@ HRESULT CVectorDEM::GetSupFormats(BYTE* lpszFormats, UINT accMode)
 	return S_FALSE;
 }
 
-HRESULT CVectorDEM::GetIImage(IImage** ppIImage)
+HRESULT CVectorDEM::GetIImage(IImageX** ppIImage)
 {
 	return S_FALSE;
 }

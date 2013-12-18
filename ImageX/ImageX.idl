@@ -14,7 +14,7 @@ import "ocidl.idl";
 	nonextensible,
 	pointer_default(unique)
 ]
-interface IImage : IDispatch{
+interface IImageX : IDispatch{
 	[id(1), helpstring("Open Image")] HRESULT Open([in] BSTR bstrPathName, [in] UINT uMode);
 	[id(2), helpstring("Create Image")] HRESULT CreateImg([in] BSTR bstrFilePath, [in] UINT uMode, [in] int Cols, [in] int Rows, [in] UINT DataType, [in] int nBandNum, [in] UINT BandType, [in] DOUBLE xStart, [in] DOUBLE yStart, [in] DOUBLE cellSize);
 	[id(3), helpstring("Close Image")] HRESULT Close(void);
@@ -76,7 +76,7 @@ interface IDEM : IDispatch{
 	[id(4)] HRESULT Close(void);
 	[id(5)] HRESULT GetSupExts([out] BYTE* lpszExts, [in] UINT accMode);
 	[id(6)] HRESULT GetSupFormats([out] BYTE* lpszFormats, [in] UINT accMode);
-	[id(7)] HRESULT GetIImage([out] IImage** ppIImage);
+	[id(7)] HRESULT GetIImage([out] IImageX** ppIImage);
 	[id(8)] HRESULT GetVertex([out] DOUBLE* pX, [out] DOUBLE* pY, [out] DOUBLE* pZ, [out] int* pVertexNum);
 	[id(9)] HRESULT GetTriangle(int nTriIndex, DOUBLE* pX, DOUBLE* pY, DOUBLE* pZ);
 	[id(10)] HRESULT GetTriangleNum([out] int* pTriangleNum);
@@ -175,9 +175,9 @@ library ImageXLib
 	[
 		uuid(80F68129-5A4C-48EF-9949-61466CC456B2)		
 	]
-	coclass ImageDriver
+	coclass ImageDriverX
 	{
-		[default] interface IImage;
+		[default] interface IImageX;
 	};
 	[
 		uuid(B2789850-0375-44A1-920E-C1919F0C1A42)		

@@ -60,7 +60,7 @@ public:
 	STDMETHOD(Close)(void);
 	STDMETHOD(GetSupExts)(BYTE* lpszExts, UINT accMode);
 	STDMETHOD(GetSupFormats)(BYTE* lpszFormats, UINT accMode);
-	STDMETHOD(GetIImage)(IImage** ppIImage);
+	STDMETHOD(GetIImage)(IImageX** ppIImage);
 	STDMETHOD(GetVertex)(DOUBLE* pX, DOUBLE* pY, DOUBLE* pZ, int* pVertexNum);
 	STDMETHOD(GetTriangle)(int nTriIndex, DOUBLE* pX, DOUBLE* pY, DOUBLE* pZ);
 	STDMETHOD(GetTriangleNum)(int* pTriangleNum);

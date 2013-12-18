@@ -31,7 +31,7 @@ HRESULT CGCPDEM::GetSupFormats(BYTE* lpszFormats, UINT accMode)
 	return S_FALSE;
 }
 
-HRESULT CGCPDEM::GetIImage(IImage** ppIImage)
+HRESULT CGCPDEM::GetIImage(IImageX** ppIImage)
 {
 	return S_FALSE;
 }
