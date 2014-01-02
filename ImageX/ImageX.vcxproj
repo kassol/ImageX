@@ -121,6 +121,7 @@
   <ItemGroup>
     <ClCompile Include="ArcGridDEM.cpp" />
     <ClCompile Include="BaseDEM.cpp" />
+    <ClCompile Include="BaseRaster.cpp" />
     <ClCompile Include="BilDEM.cpp" />
     <ClCompile Include="DEMDriver.cpp" />
     <ClCompile Include="dllmain.cpp">
@@ -150,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="ArcGridDEM.h" />
     <ClInclude Include="BaseDEM.h" />
+    <ClInclude Include="BaseRaster.h" />
     <ClInclude Include="BilDEM.h" />
     <ClInclude Include="DEMDriver.h" />
     <ClInclude Include="dllmain.h" />
