@@ -137,6 +137,7 @@
     <ClCompile Include="GCPDEM.cpp" />
     <ClCompile Include="ImageDriver.cpp" />
     <ClCompile Include="ImageX.cpp" />
+    <ClCompile Include="JPEGRaster.cpp" />
     <ClCompile Include="NSDTFDEM.cpp" />
     <ClCompile Include="RealRgn.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -160,6 +161,7 @@
     <ClInclude Include="FlatDEM.h" />
     <ClInclude Include="GCPDEM.h" />
     <ClInclude Include="ImageDriver.h" />
+    <ClInclude Include="JPEGRaster.h" />
     <ClInclude Include="NSDTFDEM.h" />
     <ClInclude Include="RealRgn.h" />
     <ClInclude Include="Resource.h" />

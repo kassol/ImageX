@@ -87,6 +87,13 @@ HRESULT CBaseRaster::Open(BSTR bstrPathPathName, UINT uMode)
 	m_strPathName = bstrPathPathName;
 	m_uMode = uMode;
 
+	CString strExt = m_strPathName.Right(m_strPathName.GetLength()-m_strPathName.ReverseFind('.')-1);
+	if (strExt.CompareNoCase("hdr"))
+	{
+		m_strPathName = m_strPathName.Left(m_strPathName.Find('.'));
+		m_strPathName += _T(".img");
+	}
+
 	if ((uMode & modeReadWrite) == modeReadWrite)
 	{
 		m_poDataset = (GDALDataset*)GDALOpen(m_strPathName.GetBuffer(0), GA_Update);

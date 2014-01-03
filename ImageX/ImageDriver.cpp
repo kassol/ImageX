@@ -874,7 +874,7 @@ STDMETHODIMP CImageDriver::Close(void)
 				return S_FALSE;
 			}
 			GDALDataset* tempoDataset = tempoDriver->CreateCopy(m_strPathName, m_poDataset, TRUE, NULL, NULL, NULL);
-			if (tempoDataset = NULL)
+			if (tempoDataset == NULL)
 			{
 				return FALSE;
 			}
