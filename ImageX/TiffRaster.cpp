@@ -253,3 +253,34 @@ HRESULT CTiffRaster::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, int Rows
 
 	return S_OK;
 }
+
+HRESULT CTiffRaster::SetGrdInfo(DOUBLE xStart, DOUBLE yStart, DOUBLE cellSize)
+{
+	CBaseRaster::SetGrdInfo(xStart, yStart, cellSize);
+
+
+	CString strTFW = m_strPathName.Left(m_strPathName.ReverseFind('.'))+_T(".tfw");
+
+	fstream outfile;
+	outfile.open(strTFW.GetBuffer(0), ios::out);
+	char* temp = new char[50];
+	memset(temp, 0, 50*sizeof(char));
+	sprintf(temp, "%.6f\n", m_lfCellSize);
+	outfile<<temp;
+	sprintf(temp, "%.6f\n", 0.0);
+	outfile<<temp;
+	sprintf(temp, "%.6f\n", 0.0);
+	outfile<<temp;
+	sprintf(temp, "%.6f\n", -m_lfCellSize);
+	outfile<<temp;
+	sprintf(temp, "%.6f\n", m_lfxStart);
+	outfile<<temp;
+	sprintf(temp, "%.6f\n", m_pGeoTrans[3]);
+	outfile<<temp;
+	outfile.clear();
+	outfile.close();
+	delete []temp;
+	temp = NULL;
+
+	return S_OK;
+}
