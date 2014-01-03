@@ -44,7 +44,7 @@ public:
 	virtual HRESULT ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int nSrcBottom, BYTE* pBuf, int nBufWid, int nBufHeight, int nBandNum, int nDestLeft, int nDestTop, int nDestRight, int nDestBottom, int nSrcSkip, int nDestSkip);
 	virtual HRESULT WriteImg(int nSrcLeft, int nSrcTop, int nSrcRight, int nSrcBottom, BYTE* pBuf, int nBufWid, int nBufHeight, int nBandNum, int nDestLeft, int nDestTop, int nDestRight, int nDestBottom, int nSrcSkip, int nDestSkip);
 	virtual HRESULT SetProgressInterface(void* pIUnknown);
-	virtual HRESULT GetSupExts(BYTE* lpszExts, UINT flags);
+	static HRESULT GetSupExts(BYTE* lpszExts, UINT flags);
 	virtual HRESULT Image2World(FLOAT x, FLOAT y, DOUBLE* pX, DOUBLE* pY);
 	virtual HRESULT World2Image(DOUBLE X, DOUBLE Y, FLOAT* px, FLOAT* py);
 	virtual HRESULT GetDefaultBand(int* nBandIndex);

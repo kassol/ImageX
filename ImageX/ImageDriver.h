@@ -3,6 +3,7 @@
 #pragma once
 #include "resource.h"       // main symbols
 #include "ImageX_i.h"
+#include "BaseRaster.h"
 
 
 
@@ -22,22 +23,7 @@ class ATL_NO_VTABLE CImageDriver :
 {
 public:
 	CImageDriver()
-		: m_poDataset(NULL)
-		, m_nWidth(0)
-		, m_nHeight(0)
-		, m_nBandNum(0)
-		, m_nDataType(-1)
-		, m_bIsGeoCoded(false)
-		, m_nBytesPerBand(0)
-		, m_nResampleMethod(0)
-		, m_nBPB(0)
-		, m_nBPP(0)
-		, m_strPathName("")
-		, m_lfxStart(0)
-		, m_lfyStart(0)
-		, m_lfCellsize(0)
-		, m_uMode(0)
-		, m_plut(NULL)
+		:pRaster(NULL)
 	{
 	}
 
@@ -60,6 +46,11 @@ END_COM_MAP()
 
 	void FinalRelease()
 	{
+		if(pRaster != NULL)
+		{
+			delete pRaster;
+			pRaster = NULL;
+		}
 	}
 
 public:
@@ -111,29 +102,7 @@ public:
 	STDMETHOD(GetTiledSize)(int* nXBlockSize, int* nYBlockSize);
 
 private:
-	GDALDataset* m_poDataset;
-	int m_nWidth;
-	int m_nHeight;
-	int m_nBandNum;
-	int m_nDataType;
-	double m_pGeoTrans[6];
-	bool m_bIsGeoCoded;
-	GDALDataType m_eGDALType;
-	int m_nBytesPerBand;
-	int m_nOldBytesPerBand;
-	int m_nResampleMethod;
-	int m_nBPB;
-	int m_nBPP;
-	CString m_strPathName;
-	double m_lfxStart;
-	double m_lfyStart;
-	double m_lfCellsize;
-	UINT m_uMode;
-	float m_fxDPI;
-	float m_fyDPI;
-	float m_fResolution, m_fXResolution, m_fYResolution;
-	bool m_bTranto8bit;
-	BYTE* m_plut;
+	CBaseRaster* pRaster;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ImageDriverX), CImageDriver)
