@@ -23,7 +23,6 @@ HRESULT CJPEGRaster::Open(BSTR bstrPathPathName, UINT uMode)
 
 HRESULT CJPEGRaster::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, int Rows, UINT DataType, int nBandNum, UINT BandType, DOUBLE xStart, DOUBLE yStart, DOUBLE cellSize)
 {
-	GDALAllRegister();
 	m_bTranto8bit = false;
 	m_uMode = uMode;
 	if ((m_uMode & modeCreate) != modeCreate)

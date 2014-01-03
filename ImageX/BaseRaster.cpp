@@ -65,6 +65,7 @@ CBaseRaster::CBaseRaster(void)
 	, m_bTranto8bit(false)
 	, m_plut(NULL)
 {
+	GDALAllRegister();
 }
 
 
@@ -74,8 +75,6 @@ CBaseRaster::~CBaseRaster(void)
 
 HRESULT CBaseRaster::Open(BSTR bstrPathPathName, UINT uMode)
 {
-	GDALAllRegister();
-
 	if ((uMode & modeAqlut) == modeAqlut)
 	{
 		m_bTranto8bit = true;
@@ -440,7 +439,6 @@ HRESULT CBaseRaster::InitPyramid()
 
 HRESULT CBaseRaster::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, int Rows, UINT DataType, int nBandNum, UINT BandType, DOUBLE xStart, DOUBLE yStart, DOUBLE cellSize)
 {
-	GDALAllRegister();
 	m_bTranto8bit = false;
 	m_uMode = uMode;
 	if ((m_uMode & modeCreate) != modeCreate)
@@ -1312,7 +1310,6 @@ HRESULT CBaseRaster::SetDPI(FLOAT xDPI, FLOAT yDPI)
 
 HRESULT CBaseRaster::Tiff2JPG(BSTR bstrTiffPath, BSTR bstrJPGPath)
 {
-	GDALAllRegister();
 	CString strTiffPath;
 	CString strJPGPath;
 

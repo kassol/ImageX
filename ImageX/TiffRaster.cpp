@@ -16,8 +16,6 @@ CTiffRaster::~CTiffRaster(void)
 
 HRESULT CTiffRaster::Open(BSTR bstrPathPathName, UINT uMode)
 {
-	GDALAllRegister();
-
 	if ((uMode & modeAqlut) == modeAqlut)
 	{
 		m_bTranto8bit = true;
@@ -121,7 +119,6 @@ void CTiffRaster::InitGeoInfo()
 
 HRESULT CTiffRaster::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, int Rows, UINT DataType, int nBandNum, UINT BandType, DOUBLE xStart, DOUBLE yStart, DOUBLE cellSize)
 {
-	GDALAllRegister();
 	m_bTranto8bit = false;
 	m_uMode = uMode;
 	if ((m_uMode & modeCreate) != modeCreate)
