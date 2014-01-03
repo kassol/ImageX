@@ -664,7 +664,7 @@ STDMETHODIMP CImageDriver::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, in
 	else if (strExt.CompareNoCase("hdr") == 0)
 	{
 		pszDriverName = "ENVI";
-		strFilePath.Left(strFilePath.Find('.'));
+		strFilePath = strFilePath.Left(strFilePath.Find('.'));
 		strFilePath += _T(".img");
 	}
 	else if (strExt.CompareNoCase("raw") == 0)

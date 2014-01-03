@@ -73,6 +73,9 @@
     <ClCompile Include="BaseRaster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TiffRaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -130,6 +133,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BaseRaster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TiffRaster.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

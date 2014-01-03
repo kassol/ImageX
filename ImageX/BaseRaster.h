@@ -1,4 +1,8 @@
 #pragma once
+
+#include "ImageX_i.h"
+#include <io.h>
+
 class CBaseRaster
 {
 public:
@@ -11,6 +15,7 @@ public:
 	virtual HRESULT Close(void);
 	virtual HRESULT IsGeoCoded(void);
 	virtual HRESULT GetBandFormat(UINT* pBandFormat);
+	virtual HRESULT GetBandNum(int* pBandBum);
 	virtual HRESULT GetRows(int* pRows);
 	virtual HRESULT GetCols(int* pCols);
 	virtual HRESULT GetDataType(UINT* pDataType);
@@ -51,6 +56,13 @@ public:
 	virtual HRESULT SetDPI(FLOAT xDPI, FLOAT yDPI);
 	virtual HRESULT Tiff2JPG(BSTR bstrTiffPath, BSTR bstrJPGPath);
 	virtual HRESULT GetTiledSize(int* nXBlockSize, int* nYBlockSize);
+
+protected:
+	void InitImgInfo();
+	HRESULT InitColorInfo();
+	void InitGeoInfo();
+	void InitExtInfo();
+	HRESULT InitPyramid();
 
 protected:
 	GDALDataset* m_poDataset;

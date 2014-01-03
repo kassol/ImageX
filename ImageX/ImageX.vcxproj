@@ -144,6 +144,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TiffDEM.cpp" />
+    <ClCompile Include="TiffRaster.cpp" />
     <ClCompile Include="Tin.cpp" />
     <ClCompile Include="VectorDEM.cpp" />
     <ClCompile Include="VirtuozoDEM.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TiffDEM.h" />
+    <ClInclude Include="TiffRaster.h" />
     <ClInclude Include="Tin.h" />
     <ClInclude Include="VectorDEM.h" />
     <ClInclude Include="VirtuozoDEM.h" />
@@ -185,4 +187,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="ImageX.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
