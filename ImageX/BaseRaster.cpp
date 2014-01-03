@@ -133,7 +133,7 @@ HRESULT CBaseRaster::Open(BSTR bstrPathPathName, UINT uMode)
 	m_nBPB = m_nBytesPerBand;
 	m_nBPP = m_nBandNum*m_nBPB;
 
-	if (m_nWidth = 0 || m_nHeight == 0 || m_nBandNum == 0 || m_nDataType == -1)
+	if (m_nWidth == 0 || m_nHeight == 0 || m_nBandNum == 0 || m_nDataType == -1)
 	{
 		return S_FALSE;
 	}
