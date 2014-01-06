@@ -87,9 +87,9 @@ HRESULT CBaseRaster::Open(BSTR bstrPathPathName, UINT uMode)
 	m_uMode = uMode;
 
 	CString strExt = m_strPathName.Right(m_strPathName.GetLength()-m_strPathName.ReverseFind('.')-1);
-	if (strExt.CompareNoCase("hdr"))
+	if (strExt.CompareNoCase("hdr") == 0)
 	{
-		m_strPathName = m_strPathName.Left(m_strPathName.Find('.'));
+		m_strPathName = m_strPathName.Left(m_strPathName.ReverseFind('.'));
 		m_strPathName += _T(".img");
 	}
 
@@ -465,7 +465,7 @@ HRESULT CBaseRaster::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, int Rows
 	else if (strExt.CompareNoCase("hdr") == 0)
 	{
 		pszDriverName = "ENVI";
-		m_strPathName = m_strPathName.Left(m_strPathName.Find('.'));
+		m_strPathName = m_strPathName.Left(m_strPathName.ReverseFind('.'));
 		m_strPathName += _T(".img");
 	}
 	else if (strExt.CompareNoCase("raw") == 0)
