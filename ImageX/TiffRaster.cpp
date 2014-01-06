@@ -113,6 +113,25 @@ void CTiffRaster::InitGeoInfo()
 			m_bIsGeoCoded = false;
 		}
 	}
+	if (m_bIsGeoCoded == false)
+	{
+		m_lfxStart = 0;
+		m_lfyStart = 0;
+		m_lfCellSize = 1;
+	}
+	else
+	{
+		m_lfxStart = m_pGeoTrans[0];
+		if (abs(m_pGeoTrans[1]) != abs(m_pGeoTrans[5]))
+		{
+			m_lfCellSize = 1;
+		}
+		else
+		{
+			m_lfCellSize = abs(m_pGeoTrans[1]);
+		}
+		m_lfyStart = m_pGeoTrans[3]-m_nHeight*m_lfCellSize;
+	}
 	infile.clear();
 	infile.close();
 }
