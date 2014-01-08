@@ -721,6 +721,7 @@ HRESULT CBaseRaster::SetGrdInfo(DOUBLE xStart, DOUBLE yStart, DOUBLE cellSize)
 	m_pGeoTrans[1] = cellSize;
 	m_pGeoTrans[5] = 0.0-cellSize;
 	m_pGeoTrans[2] = m_pGeoTrans[4] = 0;
+	m_bIsGeoCoded = true;
 	if (CE_Failure == m_poDataset->SetGeoTransform(m_pGeoTrans))
 	{
 		return S_FALSE;
