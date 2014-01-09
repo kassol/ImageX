@@ -1337,5 +1337,3 @@ HRESULT CBaseRaster::GetTiledSize(int* nXBlockSize, int* nYBlockSize)
 	m_poDataset->GetRasterBand(1)->GetBlockSize(nXBlockSize, nYBlockSize);
 	return S_OK;
 }
-
-
