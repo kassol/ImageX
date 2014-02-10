@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "BaseRaster.h"
 
-
+HANDLE hmutex2 = CreateMutex(NULL, FALSE, _T("RW"));
 
 
 #define BiLinear_img(Type) void Type##_BiLinear_img(BYTE *buf11,BYTE *buf21, \
@@ -223,6 +223,7 @@ HRESULT CBaseRaster::InitColorInfo()
 	m_plut = new BYTE[m_nBandNum*65536];
 	m_nOldBytesPerBand = m_nBytesPerBand;
 	m_nBytesPerBand = 1;
+	WaitForSingleObject(hmutex2, INFINITE);
 	FILE* stream;
 	CString strLutPath = m_strPathName+_T(".lut");
 	if (_access(strLutPath, 0) != -1)
@@ -330,6 +331,7 @@ HRESULT CBaseRaster::InitColorInfo()
 		}
 		fclose(stream);
 	}
+	ReleaseMutex(hmutex2);
 	return S_OK;
 }
 

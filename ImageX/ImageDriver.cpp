@@ -11,45 +11,6 @@
 #include "SatRaster.h"
 using namespace std;
 
-HANDLE hmutex2 = CreateMutex(NULL, FALSE, _T("RW"));
-
-// CImageDriver
-#define BiLinear_img(Type) void Type##_BiLinear_img(BYTE *buf11,BYTE *buf21, \
-	BYTE *buf22,BYTE *buf12, \
-	double Dx,double Dy,     \
-	BYTE *pOut)				\
-{																\
-	*((Type *)pOut) = (Type)((1-Dx) * (1-Dy) * (*((Type*)buf11))			\
-	+ Dx     * (1-Dy) * (*((Type*)buf21))				\
-	+ Dx     * Dy     * (*((Type*)buf22))				\
-	+ (1-Dx) * Dy     * (*((Type*)buf12)));			\
-}
-
-	inline BiLinear_img(BYTE)
-	inline BiLinear_img(USHORT)
-	inline BiLinear_img(short)
-	inline BiLinear_img(UINT)
-	inline BiLinear_img(int)
-	inline BiLinear_img(float)
-	inline BiLinear_img(double)
-	inline BiLinear_img(__int64)
-
-#define FuncName_img(Type) Type##_BiLinear_img
-
-	typedef void (* BiLinearFunc_img)(BYTE *buf11,BYTE *buf21, BYTE *buf22,BYTE *buf12,double Dx,double Dy, BYTE *pOut);
-
-static BiLinearFunc_img FuncTable_img[9] = {FuncName_img(BYTE),
-	FuncName_img(USHORT),
-	FuncName_img(short),
-	FuncName_img(UINT),
-	FuncName_img(int),
-	FuncName_img(float),
-	FuncName_img(double),
-	FuncName_img(__int64),
-	FuncName_img(__int64)//the singed int64 is same as int64
-};
-
-
 STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 {
 	CString strPathName;
@@ -78,7 +39,7 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 
 
 STDMETHODIMP CImageDriver::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, int Rows, 
-																			   UINT DataType, int nBandNum, UINT BandType, DOUBLE xStart, DOUBLE yStart, DOUBLE cellSize)
+														UINT DataType, int nBandNum, UINT BandType, DOUBLE xStart, DOUBLE yStart, DOUBLE cellSize)
 {
 	CString strPathName;
 	strPathName = bstrFilePath;
