@@ -606,7 +606,10 @@ HRESULT CBaseRaster::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, int Rows
 
 HRESULT CBaseRaster::Close()
 {
-	GDALClose((GDALDatasetH)m_poDataset);
+	if (m_poDataset != NULL)
+	{
+		GDALClose((GDALDatasetH)m_poDataset);
+	}
 	if (m_bTranto8bit)
 	{
 		delete []m_plut;

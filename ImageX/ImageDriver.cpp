@@ -63,9 +63,9 @@ STDMETHODIMP CImageDriver::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, in
 
 STDMETHODIMP CImageDriver::Close(void)
 {
-	pRaster->Close();
 	if (pRaster != NULL)
 	{
+		pRaster->Close();
 		delete pRaster;
 		pRaster = NULL;
 	}
