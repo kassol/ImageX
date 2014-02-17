@@ -1206,7 +1206,25 @@ HRESULT CBaseRaster::SetProgressInterface(void* pIUnknown)
 
 HRESULT CBaseRaster::GetSupExts(BYTE* lpszExts, UINT flags)
 {
-	strcpy((char*)lpszExts, "Tiff file(*.tif;*.tiff)|*.tif;*.tiff|Ecw file(*.ecw)|*.ecw|Erdas file(*.img)|*.img|Hdr file(*.hdr)|*.hdr|Jpeg file(*.jpeg;*.jpg)|*.jpeg;*.jpg|Nitf file(*.ntf)|*.ntf|Bitmap file(*.bmp)|*.bmp|All file(*.*)|*.*||");
+	
+	if ((flags & modeReadWrite) == modeReadWrite)
+	{
+		strcpy((char*)lpszExts, "Tiff file(*.tif;*.tiff)|*.tif;*.tiff|Ecw file(*.ecw)|*.ecw\
+								|Erdas file(*.img)|*.img|Hdr file(*.hdr)|*.hdr\
+								|Nitf file(*.ntf)|*.ntf|Bitmap file(*.bmp)|*.bmp|All file(*.*)|*.*||");
+	}
+	else if ((flags & modeRead) == modeRead)
+	{
+		strcpy((char*)lpszExts, "Tiff file(*.tif;*.tiff)|*.tif;*.tiff|Erdas file(*.img)|*.img|\
+								Hdr file(*.hdr)|*.hdr|Jpeg file(*.jpeg;*.jpg)|*.jpeg;*.jpg\
+								|Nitf file(*.ntf)|*.ntf|Bitmap file(*.bmp)|*.bmp|Sat file(*.sat)|*.sat|Ads file(*.ads)|*.ads|All file(*.*)|*.*||");
+	}
+	else if ((flags & modeCreate) == modeCreate)
+	{
+		strcpy((char*)lpszExts, "Tiff file(*.tif;*.tiff)|*.tif;*.tiff|Erdas file(*.img)|*.img|\
+								Hdr file(*.hdr)|*.hdr|Jpeg file(*.jpeg;*.jpg)|*.jpeg;*.jpg\
+								|Nitf file(*.ntf)|*.ntf|Bitmap file(*.bmp)|*.bmp|All file(*.*)|*.*||");
+	}
 	return S_OK;
 }
 

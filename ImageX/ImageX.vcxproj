@@ -119,6 +119,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AdsRaster.cpp" />
     <ClCompile Include="ArcGridDEM.cpp" />
     <ClCompile Include="BaseDEM.cpp" />
     <ClCompile Include="BaseRaster.cpp" />
@@ -152,6 +153,7 @@
     <ClCompile Include="VirtuozoDEM.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdsRaster.h" />
     <ClInclude Include="ArcGridDEM.h" />
     <ClInclude Include="BaseDEM.h" />
     <ClInclude Include="BaseRaster.h" />

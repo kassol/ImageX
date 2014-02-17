@@ -69,7 +69,7 @@ protected:
 	int m_nWidth;
 	int m_nHeight;
 	int m_nBandNum;
-	int m_nDataType;
+	unsigned int m_nDataType;
 	double m_pGeoTrans[6];
 	bool m_bIsGeoCoded;
 	GDALDataType m_eGDALType;

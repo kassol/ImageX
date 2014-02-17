@@ -82,6 +82,9 @@
     <ClCompile Include="SatRaster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AdsRaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -148,6 +151,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SatRaster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AdsRaster.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

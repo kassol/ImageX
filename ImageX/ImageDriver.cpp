@@ -9,6 +9,7 @@
 #include "TiffRaster.h"
 #include "JPEGRaster.h"
 #include "SatRaster.h"
+#include "AdsRaster.h"
 using namespace std;
 
 STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
@@ -28,6 +29,10 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 	else if (strExt.CompareNoCase("sat") == 0)
 	{
 		pRaster = new CSatRaster();
+	}
+	else if (strExt.CompareNoCase("ads") == 0)
+	{
+		pRaster = new CAdsRaster();
 	}
 	else
 	{

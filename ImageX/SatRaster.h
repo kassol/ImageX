@@ -9,6 +9,8 @@ public:
 
 public:
 	HRESULT Open(BSTR bstrPathPathName, UINT uMode);
-	HRESULT ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int nSrcBottom, BYTE* pBuf, int nBufWid, int nBufHeight, int nBandNum, int nDestLeft, int nDestTop, int nDestRight, int nDestBottom, int nSrcSkip, int nDestSkip);
+	HRESULT ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int nSrcBottom, 
+		BYTE* pBuf, int nBufWid, int nBufHeight, int nBandNum, 
+		int nDestLeft, int nDestTop, int nDestRight, int nDestBottom, int nSrcSkip, int nDestSkip);
 };
 

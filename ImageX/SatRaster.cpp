@@ -29,6 +29,10 @@ HRESULT CSatRaster::Open(BSTR bstrPathPathName, UINT uMode)
 	string temp;
 	ifstream srcSat;
 	srcSat.open(m_strPathName.GetBuffer(0), ios::in);
+	if (!srcSat)
+	{
+		return S_FALSE;
+	}
 	int nTileCount = 0;
 	getline(srcSat, temp);
 	nTileCount = atoi(temp.c_str());
@@ -346,6 +350,10 @@ HRESULT CSatRaster::ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int nSrcBo
 				}
 				GDALClose((GDALDatasetH)m_poDataset);
 				m_poDataset = (GDALDataset*)GDALOpen(strImagePath.GetBuffer(0), GA_ReadOnly);
+				if (m_poDataset == NULL)
+				{
+					return S_FALSE;
+				}
 				int *bandmap = new int[nBandNum];
 				for (int i = 0; i < nBandNum; ++i)
 				{
@@ -409,6 +417,10 @@ HRESULT CSatRaster::ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int nSrcBo
 				}
 				GDALClose((GDALDatasetH)m_poDataset);
 				m_poDataset = (GDALDataset*)GDALOpen(strImagePath.GetBuffer(0), GA_ReadOnly);
+				if (m_poDataset == NULL)
+				{
+					return S_FALSE;
+				}
 				if (!m_bTranto8bit)
 				{
 					CPLErr er = m_poDataset->GetRasterBand(nSrcSkip+1)->RasterIO(GF_Read, nSrcLeftTmp,
