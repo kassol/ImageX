@@ -56,6 +56,7 @@ public:
 	virtual HRESULT SetDPI(FLOAT xDPI, FLOAT yDPI);
 	virtual HRESULT Tiff2JPG(BSTR bstrTiffPath, BSTR bstrJPGPath);
 	virtual HRESULT GetTiledSize(int* nXBlockSize, int* nYBlockSize);
+	virtual HRESULT Translate(BSTR bstrImgPath);
 
 protected:
 	void InitImgInfo();

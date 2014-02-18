@@ -346,3 +346,13 @@ STDMETHODIMP CImageDriver::GetTiledSize(int* nXBlockSize, int* nYBlockSize)
 
 	return pRaster->GetTiledSize(nXBlockSize, nYBlockSize);
 }
+
+
+STDMETHODIMP CImageDriver::Translate(BSTR bstrImgPath)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	// TODO: Add your implementation code here
+
+	return pRaster->Translate(bstrImgPath);
+}

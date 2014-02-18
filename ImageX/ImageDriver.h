@@ -103,6 +103,8 @@ public:
 
 private:
 	CBaseRaster* pRaster;
+public:
+	STDMETHOD(Translate)(BSTR bstrImgPath);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ImageDriverX), CImageDriver)

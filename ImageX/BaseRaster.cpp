@@ -1209,21 +1209,21 @@ HRESULT CBaseRaster::GetSupExts(BYTE* lpszExts, UINT flags)
 	
 	if ((flags & modeReadWrite) == modeReadWrite)
 	{
-		strcpy((char*)lpszExts, "Tiff file(*.tif;*.tiff)|*.tif;*.tiff|Ecw file(*.ecw)|*.ecw\
+		strcpy((char*)lpszExts, "Tiff file(*.tif;*.tiff)|*.tif; *.tiff|Ecw file(*.ecw)|*.ecw\
 								|Erdas file(*.img)|*.img|Hdr file(*.hdr)|*.hdr\
-								|Nitf file(*.ntf)|*.ntf|Bitmap file(*.bmp)|*.bmp|All file(*.*)|*.*||");
+								|Nitf file(*.ntf)|*.ntf|Bitmap file(*.bmp)|*.bmp|All file (*.*)|*.*||");
 	}
 	else if ((flags & modeRead) == modeRead)
 	{
-		strcpy((char*)lpszExts, "Tiff file(*.tif;*.tiff)|*.tif;*.tiff|Erdas file(*.img)|*.img|\
-								Hdr file(*.hdr)|*.hdr|Jpeg file(*.jpeg;*.jpg)|*.jpeg;*.jpg\
-								|Nitf file(*.ntf)|*.ntf|Bitmap file(*.bmp)|*.bmp|Sat file(*.sat)|*.sat|Ads file(*.ads)|*.ads|All file(*.*)|*.*||");
+		strcpy((char*)lpszExts, "Tiff file (*.tif;*.tiff)|*.tif; *.tiff|Erdas file (*.img)|*.img|\
+								Hdr file (*.hdr)|*.hdr|Jpeg file (*.jpg;*.jpeg)|*.jpg; *.jpeg\
+								|Nitf file (*.ntf)|*.ntf|Bitmap file (*.bmp)|*.bmp|Sat file (*.sat)|*.sat|Ads file (*.ads)|*.ads|All file (*.*)|*.*||");
 	}
 	else if ((flags & modeCreate) == modeCreate)
 	{
-		strcpy((char*)lpszExts, "Tiff file(*.tif;*.tiff)|*.tif;*.tiff|Erdas file(*.img)|*.img|\
-								Hdr file(*.hdr)|*.hdr|Jpeg file(*.jpeg;*.jpg)|*.jpeg;*.jpg\
-								|Nitf file(*.ntf)|*.ntf|Bitmap file(*.bmp)|*.bmp|All file(*.*)|*.*||");
+		strcpy((char*)lpszExts, "Tiff file (*.tif;*.tiff)|*.tif; *.tiff|Erdas file (*.img)|*.img|\
+								Hdr file (*.hdr)|*.hdr|Jpeg file (*.jpg;*.jpeg)|*.jpg; *.jpeg\
+								|Nitf file (*.ntf)|*.ntf|Bitmap file (*.bmp)|*.bmp|All file (*.*)|*.*||");
 	}
 	return S_OK;
 }
@@ -1358,5 +1358,68 @@ HRESULT CBaseRaster::Tiff2JPG(BSTR bstrTiffPath, BSTR bstrJPGPath)
 HRESULT CBaseRaster::GetTiledSize(int* nXBlockSize, int* nYBlockSize)
 {
 	m_poDataset->GetRasterBand(1)->GetBlockSize(nXBlockSize, nYBlockSize);
+	return S_OK;
+}
+
+HRESULT CBaseRaster::Translate(BSTR bstrImgPath)
+{
+	CString strImgPath(bstrImgPath);
+	CString strExt = strImgPath.Right(strImgPath.GetLength()-strImgPath.ReverseFind('.')-1);
+	CString strExtthis = m_strPathName.Right(m_strPathName.GetLength()-m_strPathName.ReverseFind('.')-1);
+
+	if (m_poDataset == NULL)
+	{
+		return S_FALSE;
+	}
+
+	char* pszDriverName = NULL;
+	
+	if (strExt.CompareNoCase(strExtthis) == 0)
+	{
+		return S_FALSE;
+	}
+
+	if (strExt.CompareNoCase("bmp") == 0)
+	{
+		pszDriverName = "BMP";
+	}
+	else if (strExt.CompareNoCase("tif") == 0 || strExt.CompareNoCase("tiff") == 0)
+	{
+		pszDriverName = "GTIFF";
+	}
+	else if (strExt.CompareNoCase("jpg") == 0 || strExt.CompareNoCase("jpeg") == 0)
+	{
+		pszDriverName = "JPEG";
+	}
+	else if (strExt.CompareNoCase("img") == 0)
+	{
+		pszDriverName = "HFA";
+	}
+	else if (strExt.CompareNoCase("ntf") == 0)
+	{
+		pszDriverName = "NITF";
+	}
+	else if (strExt.CompareNoCase("hdr") == 0)
+	{
+		pszDriverName = "ENVI";
+		strImgPath = strImgPath.Left(strImgPath.ReverseFind('.')) + _T(".img");
+	}
+	else if (strExt.CompareNoCase("raw") == 0)
+	{
+		pszDriverName = "EIR";
+	}
+	else
+	{
+		return S_FALSE;
+	}
+
+	GDALDriver* tempoDriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
+
+	GDALDataset* tempoDataset = tempoDriver->CreateCopy(strImgPath.GetBuffer(0), m_poDataset, TRUE, NULL, NULL, NULL);
+	if (tempoDataset == NULL)
+	{
+		return S_FALSE;
+	}
+	GDALClose((GDALDatasetH)tempoDataset);
 	return S_OK;
 }

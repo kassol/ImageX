@@ -59,8 +59,9 @@ interface IImageX : IDispatch{
 	[id(50), helpstring("SetSensorType")] HRESULT SetSensorType([in] int nSensorType);
 	[id(51), helpstring("GetDPI")] HRESULT GetDPI([out] FLOAT* pxDPI, [out] FLOAT* pyDPI);
 	[id(52), helpstring("SetDPI")] HRESULT SetDPI([in] FLOAT xDPI, [in] FLOAT yDPI);
-	[id(53)] HRESULT Tiff2JPG([in] BSTR bstrTiffPath, [in] BSTR bstrJPGPath);
+	[id(53), helpstring("Tiff2JPG")] HRESULT Tiff2JPG([in] BSTR bstrTiffPath, [in] BSTR bstrJPGPath);
 	[id(54), helpstring("GetTiledSize")] HRESULT GetTiledSize([out] int* nXBlockSize, [out] int* nYBlockSize);
+	[id(55), helpstring("Translate")] HRESULT Translate([in] BSTR bstrImgPath);
 };
 [
 	object,
