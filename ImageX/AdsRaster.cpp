@@ -4,10 +4,10 @@
 #include "TiffRaster.h"
 
 CAdsRaster::CAdsRaster(void)
-	: m_bIsLineBlock(false)
-	, m_nLinePerBlock(0)
+	: m_nLinePerBlock(0)
 	, m_nSamplePerBlock(0)
-	, m_nBlockNum(0)
+	, m_nHBlockNum(0)
+	, m_nVBlockNum(0)
 {
 }
 
@@ -55,17 +55,9 @@ HRESULT CAdsRaster::Open(BSTR bstrPathPathName, UINT uMode)
 	infile>>nlineperblock;
 	infile>>ch;
 	infile>>nsampleperblock;
-	nblock = (nline + nlineperblock - 1)/nlineperblock;
-	islineblock = true;
+	m_nVBlockNum = (nline+nlineperblock-1)/nlineperblock;
+	m_nHBlockNum = (nsample+nsampleperblock-1)/nsampleperblock;
 
-	if (nblock == 1)
-	{
-		nblock = (nsample + nsampleperblock - 1)/nsampleperblock;
-		islineblock = false;
-	}
-
-	m_bIsLineBlock = islineblock;
-	m_nBlockNum = nblock;
 	m_nLinePerBlock = nlineperblock;
 	m_nSamplePerBlock = nsampleperblock;
 
@@ -74,16 +66,22 @@ HRESULT CAdsRaster::Open(BSTR bstrPathPathName, UINT uMode)
 		m_vecImgList.clear();
 	}
 
-	for (int n = 0; n < nblock; ++n)
+	m_vecImgList.resize(m_nHBlockNum*m_nVBlockNum, _T(""));
+
+	int ncolindex = 0;
+	int nrowindex = 0;
+	for (int n = 0; n < m_nHBlockNum*m_nVBlockNum; ++n)
 	{
 		infile>>ch;
-		infile>>temp;
-		infile>>temp;
+		infile>>ncolindex;
+		infile>>nrowindex;
 		infile>>ch;
 
+		int index = nrowindex*m_nHBlockNum+ncolindex;
+
 		CString strImageName(ch);
-		CString strImgPath = m_strPathName.Left(m_strPathName.ReverseFind('\\')+1)+strImageName;
-		m_vecImgList.push_back(strImgPath);
+		strImageName = m_strPathName.Left(m_strPathName.ReverseFind('\\')+1)+strImageName;
+		m_vecImgList[index] = strImageName;
 	}
 
 	CString strImgPath = m_vecImgList.front();
@@ -98,6 +96,9 @@ HRESULT CAdsRaster::Open(BSTR bstrPathPathName, UINT uMode)
 	pRaster->GetBPP(&m_nBPP);
 
 	pRaster->GetGrdInfo(&m_lfxStart, &m_lfyStart, &m_lfCellSize);
+
+	m_lfyStart += m_nLinePerBlock*m_lfCellSize;
+	m_lfyStart -= m_nHeight*m_lfCellSize;
 
 	pRaster->Close();
 	delete pRaster;
@@ -150,35 +151,25 @@ HRESULT CAdsRaster::ReadImg(int nSrcLeft, int nSrcTop, int nSrcRight, int nSrcBo
 	nDestBottom += int(nEndRowOffset*lfScale);
 
 	int left = 0, right = 0, top = 0, bottom = 0;
-	for (int n = 0; n < m_nBlockNum; ++n)
+	for (int n = 0; n < m_nHBlockNum*m_nVBlockNum; ++n)
 	{
-		if (!m_bIsLineBlock)
+		left = n%m_nHBlockNum*m_nSamplePerBlock;
+		if (n%m_nHBlockNum != m_nHBlockNum-1)
 		{
-			left = m_nSamplePerBlock*n;
-			if (n != m_nBlockNum-1)
-			{
-				right = m_nSamplePerBlock*(n+1);
-			}
-			else
-			{
-				right = m_nWidth;
-			}
-			top = 0;
-			bottom = m_nHeight;
+			right = (n%m_nHBlockNum+1)*m_nSamplePerBlock;
 		}
 		else
 		{
-			left = 0;
 			right = m_nWidth;
-			bottom = m_nHeight-m_nLinePerBlock*n;
-			if (n != m_nBlockNum-1)
-			{
-				top = m_nHeight-m_nLinePerBlock*(n+1);
-			}
-			else
-			{
-				top = 0;
-			}
+		}
+		bottom = m_nHeight-m_nLinePerBlock*(n/m_nHBlockNum);
+		if (n/m_nHBlockNum != m_nVBlockNum-1)
+		{
+			top = m_nHeight-m_nLinePerBlock*(n/m_nHBlockNum+1);
+		}
+		else
+		{
+			top = 0;
 		}
 
 		int nTileSrcLeft = left;

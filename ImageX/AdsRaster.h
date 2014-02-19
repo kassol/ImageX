@@ -17,8 +17,8 @@ public:
 
 private:
 	std::vector<CString> m_vecImgList;
-	bool m_bIsLineBlock;
-	int m_nBlockNum;
+	int m_nHBlockNum;
+	int m_nVBlockNum;
 	int m_nLinePerBlock;
 	int m_nSamplePerBlock;
 };
