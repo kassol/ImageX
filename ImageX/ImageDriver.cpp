@@ -16,6 +16,12 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 {
 	CString strPathName;
 	strPathName = bstrPathName;
+
+	if (_access(strPathName, 0) == -1)
+	{
+		return S_FALSE;
+	}
+
 	CString strExt = strPathName.Right(strPathName.GetLength()-strPathName.ReverseFind('.')-1);
 
 	if (strExt.CompareNoCase("tif") == 0 || strExt.CompareNoCase("tiff") == 0)
@@ -30,9 +36,49 @@ STDMETHODIMP CImageDriver::Open(BSTR bstrPathName, UINT uMode)
 	{
 		pRaster = new CSatRaster();
 	}
-	else if (strExt.CompareNoCase("ads") == 0)
-	{
+	else if (strExt.CompareNoCase("sup") == 0)
+	{	
+		ifstream infile;
+		infile.open(strPathName.GetBuffer(0), ios::in);
+		if (!infile)
+		{
+			return S_FALSE;
+		}
+
+		char ch[500];
+		memset(ch, 0, 500);
+		infile.getline(ch, 500);
+		infile.getline(ch, 500);
+
+		int nPyramid = 0;
+		infile>>ch;
+		infile>>nPyramid;
+		infile>>ch;
+
+		CString strAdaFilePath = ch;
+
+		strAdaFilePath = strAdaFilePath.Right(strAdaFilePath.GetLength() - 1);
+		strAdaFilePath = strAdaFilePath.Left(strAdaFilePath.GetLength() - 1);
+
+		while(1)
+		{
+			int nIndex = strAdaFilePath.ReverseFind('/');
+			if (nIndex == -1)
+			{
+				break;
+			}
+
+			strAdaFilePath = strAdaFilePath.Left(nIndex) + "\\" + strAdaFilePath.Right(strAdaFilePath.GetLength() - nIndex - 1);
+
+		}
+
+		if (_access(strAdaFilePath, 0) == -1)
+		{
+			return S_FALSE;
+		}
+
 		pRaster = new CAdsRaster();
+		return pRaster->Open(_bstr_t(strAdaFilePath), uMode);
 	}
 	else
 	{
@@ -62,6 +108,7 @@ STDMETHODIMP CImageDriver::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, in
 	{
 		pRaster = new CBaseRaster();
 	}
+
 	return pRaster->CreateImg(bstrFilePath, uMode, Cols, Rows, DataType, nBandNum, BandType, xStart, yStart, cellSize);
 }
 
@@ -136,7 +183,6 @@ STDMETHODIMP CImageDriver::GetGrdInfo(DOUBLE* xStart, DOUBLE* yStart, DOUBLE* ce
 {
 	return pRaster->GetGrdInfo(xStart, yStart, cellSize);
 }
-
 
 STDMETHODIMP CImageDriver::SetGrdInfo(DOUBLE xStart, DOUBLE yStart, DOUBLE cellSize)
 {

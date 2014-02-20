@@ -1217,7 +1217,7 @@ HRESULT CBaseRaster::GetSupExts(BYTE* lpszExts, UINT flags)
 	{
 		strcpy((char*)lpszExts, "Tiff file (*.tif;*.tiff)|*.tif; *.tiff|Erdas file (*.img)|*.img|\
 								Hdr file (*.hdr)|*.hdr|Jpeg file (*.jpg;*.jpeg)|*.jpg; *.jpeg\
-								|Nitf file (*.ntf)|*.ntf|Bitmap file (*.bmp)|*.bmp|Sat file (*.sat)|*.sat|Ads file (*.ads)|*.ads|All file (*.*)|*.*||");
+								|Nitf file (*.ntf)|*.ntf|Bitmap file (*.bmp)|*.bmp|Sat file (*.sat)|*.sat|ADS40 file (*.sup)|*.ads|All file (*.*)|*.*||");
 	}
 	else if ((flags & modeCreate) == modeCreate)
 	{
