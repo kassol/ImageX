@@ -29,6 +29,10 @@ HRESULT CTiffRaster::Open(BSTR bstrPathPathName, UINT uMode)
 
 	if ((uMode & modeReadWrite) == modeReadWrite)
 	{
+		if (_access(m_strPathName.GetBuffer(0), 2) == -1)
+		{
+			return S_FALSE;
+		}
 		m_poDataset = (GDALDataset*)GDALOpen(m_strPathName.GetBuffer(0), GA_Update);
 	}
 	else if (((uMode & modeRead) == modeRead) && ((uMode & modePyramidCreate) == modePyramidCreate))
