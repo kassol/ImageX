@@ -262,6 +262,25 @@ HRESULT CNSDTFDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMode
 
 		return S_FALSE;
 	}
+
+	if(m_pImage!=NULL)
+	{
+		m_pImage->Close();
+		m_pImage->Release();
+		m_pImage=NULL;
+		DeleteFile(m_strDemImage);
+		DeleteFile(m_strDemImage.Left(m_strDemImage.ReverseFind('.'))+".img");
+	}
+
+	HRESULT hRes=CoCreateInstance(CLSID_ImageDriverX,NULL,CLSCTX_ALL,IID_IImageX,(void**)&m_pImage);
+	if(FAILED(hRes))
+	{
+		return S_FALSE;
+	}
+
+	m_strDemImage = strPathName.Left(strPathName.ReverseFind('.'))+_T("~~.hdr");
+	
+
 	//读取数据
 	FILE* fp=fopen(strPathName,"rt");
 	if(fp==NULL)
@@ -287,109 +306,9 @@ HRESULT CNSDTFDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMode
 	m_AveAltitude=0;
 	m_MaxAltitude=-99999.9;
 	m_MinAltitude=99999.9;
-	double* pAltitude=new double[m_nRows*m_nCols];
-	if(fabs(m_Kappa)<1e-5)
-	{
-		for(int i=m_nRows-1;i>=0;i--)
-		{
-			double temp=0;
-			int nCount=0;
-			double* pAltitudeIndex=pAltitude+m_nCols*i;
-			for(int j=0;j<m_nCols;j++)
-			{
-				fscanf(fp,"%lf",pAltitudeIndex+j);
-
-				if(fabs(pAltitudeIndex[j]+99999.0)<1e-5)
-				{
-					pAltitudeIndex[j]=DBL_MAX;
-				}
-				else
-				{
-					pAltitudeIndex[j]/=nHZoom;
-					pAltitudeIndex[j]+=m_lfAltitudeOffset;
-
-					if(pAltitudeIndex[j]>m_MaxAltitude)
-					{
-						m_MaxAltitude=pAltitudeIndex[j];
-					}
-					if(pAltitudeIndex[j]<m_MinAltitude)
-					{
-						m_MinAltitude=pAltitudeIndex[j];
-					}
-
-					temp+=pAltitudeIndex[j];
-					nCount++;
-				}
-			}
-			if(nCount>0)
-			{
-				m_AveAltitude+=(temp/nCount);
-			}
-		}
-	}
-	else
-	{
-		for(int i=0;i<m_nRows;i++)
-		{
-			double temp=0;
-			int nCount=0;
-			double* pAltitudeIndex=pAltitude+m_nCols*i;
-			for(int j=0;j<m_nCols;j++)
-			{
-				fscanf(fp,"%lf",pAltitudeIndex+j);
-
-				if(fabs(pAltitudeIndex[j]+99999.0)<1e-5)
-				{
-					pAltitudeIndex[j]=DBL_MAX;
-				}
-				else
-				{
-					pAltitudeIndex[j]/=nHZoom;
-					pAltitudeIndex[j]+=m_lfAltitudeOffset;
-
-					if(pAltitudeIndex[j]>m_MaxAltitude)
-					{
-						m_MaxAltitude=pAltitudeIndex[j];
-					}
-					if(pAltitudeIndex[j]<m_MinAltitude)
-					{
-						m_MinAltitude=pAltitudeIndex[j];
-					}
-
-					temp+=pAltitudeIndex[j];
-					nCount++;
-				}
-			}
-			if(nCount>0)
-			{
-				m_AveAltitude+=(temp/nCount);
-			}
-		}
-	}
-	m_AveAltitude/=m_nRows;
-	fclose(fp);
-
-	//构造DEM栅格影像
-	if(m_pImage!=NULL)
-	{
-		m_pImage->Close();
-		m_pImage->Release();
-		m_pImage=NULL;
-		DeleteFile(m_strDemImage);
-		DeleteFile(m_strDemImage.Left(m_strDemImage.ReverseFind('.'))+".img");
-	}
-
-	HRESULT hRes=CoCreateInstance(CLSID_ImageDriverX,NULL,CLSCTX_ALL,IID_IImageX,(void**)&m_pImage);
-	if(FAILED(hRes))
-	{
-		AfxMessageBox(IDS_IMGDRIVER_FAIL);
-		delete [] pAltitude;
-		pAltitude=NULL;
-
-		return S_FALSE;
-	}
-
-	m_strDemImage = strPathName.Left(strPathName.ReverseFind('.'))+_T("~~.hdr");
+	const int nBlockSize = 512;
+	double* pAltitude=new double[nBlockSize*m_nCols];
+	
 	int index=1;
 
 	WaitForSingleObject(hMutex, INFINITE);
@@ -399,10 +318,8 @@ HRESULT CNSDTFDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMode
 		strTemp.Format(_T("~~%d.hdr"),index++);
 		m_strDemImage=strPathName.Left(strPathName.ReverseFind('.'))+strTemp;
 	}
-
 	_bstr_t bstrDemImage=m_strDemImage;
-
-	if(fabs(m_Kappa)<1e-5)
+	if (fabs(m_Kappa) < 1e-5)
 	{
 		if(m_pImage->CreateImg(bstrDemImage,modeCreate|modeWrite,
 			m_nCols,m_nRows,Pixel_Double,
@@ -420,17 +337,97 @@ HRESULT CNSDTFDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMode
 
 			delete [] pAltitude;
 			pAltitude=NULL;
+			fclose(fp);
 
 			return S_FALSE;
 		}
-
 		ReleaseMutex(hMutex);
 
-		m_pImage->WriteImg(0,0,m_nCols,m_nRows,
-			(BYTE*)pAltitude,m_nCols,m_nRows,
-			1,
-			0,0,m_nCols,m_nRows,
-			-1,0);
+		for (int i = 0; i < m_nRows;)
+		{
+			if (i+nBlockSize < m_nRows)
+			{
+				for (int y = nBlockSize-1; y >= 0; --y)
+				{
+					double temp=0;
+					int nCount=0;
+					double* pAltitudeIndex=pAltitude+m_nCols*y;
+					for (int j = 0; j < m_nCols; ++j)
+					{
+						fscanf(fp,"%lf",pAltitudeIndex+j);
+						if(fabs(pAltitudeIndex[j]+99999.0)<1e-5)
+						{
+							pAltitudeIndex[j]=DBL_MAX;
+						}
+						else
+						{
+							pAltitudeIndex[j]/=nHZoom;
+							pAltitudeIndex[j]+=m_lfAltitudeOffset;
+
+							if(pAltitudeIndex[j]>m_MaxAltitude)
+							{
+								m_MaxAltitude=pAltitudeIndex[j];
+							}
+							if(pAltitudeIndex[j]<m_MinAltitude)
+							{
+								m_MinAltitude=pAltitudeIndex[j];
+							}
+
+							temp+=pAltitudeIndex[j];
+							nCount++;
+						}
+					}
+					if(nCount>0)
+					{
+						m_AveAltitude+=(temp/nCount);
+					}
+				}
+				m_pImage->WriteImg(0, i, m_nCols, i+nBlockSize,
+					(BYTE*)pAltitude, m_nCols, nBlockSize, 1, 0, 0, m_nCols, nBlockSize, -1, 0);
+				i += nBlockSize;
+			}
+			else
+			{
+				for (int y = nBlockSize-1; y >=nBlockSize-1-(m_nRows-i-1); --y)
+				{
+					double temp=0;
+					int nCount=0;
+					double* pAltitudeIndex=pAltitude+m_nCols*y;
+					for (int j = 0; j < m_nCols; ++j)
+					{
+						fscanf(fp,"%lf",pAltitudeIndex+j);
+						if(fabs(pAltitudeIndex[j]+99999.0)<1e-5)
+						{
+							pAltitudeIndex[j]=DBL_MAX;
+						}
+						else
+						{
+							pAltitudeIndex[j]/=nHZoom;
+							pAltitudeIndex[j]+=m_lfAltitudeOffset;
+
+							if(pAltitudeIndex[j]>m_MaxAltitude)
+							{
+								m_MaxAltitude=pAltitudeIndex[j];
+							}
+							if(pAltitudeIndex[j]<m_MinAltitude)
+							{
+								m_MinAltitude=pAltitudeIndex[j];
+							}
+
+							temp+=pAltitudeIndex[j];
+							nCount++;
+						}
+					}
+					if(nCount>0)
+					{
+						m_AveAltitude+=(temp/nCount);
+					}
+				}
+				m_pImage->WriteImg(0, i, m_nCols, m_nRows,
+					(BYTE*)pAltitude, m_nCols, nBlockSize, 1, 0, 0, m_nCols, m_nRows-i, -1, 0);
+				i = m_nRows;
+			}
+		}
 	}
 	else
 	{
@@ -466,6 +463,7 @@ HRESULT CNSDTFDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMode
 			1,BSQ,
 			LBX,LBY,m_XCellSize)!=S_OK)
 		{
+			ReleaseMutex(hMutex);
 			CString strMsg;
 			strMsg.Format(IDS_FILE_OPEN_FAILED,m_strDemImage);
 			AfxMessageBox(strMsg);
@@ -476,63 +474,200 @@ HRESULT CNSDTFDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMode
 			delete [] pAltitude;
 			pAltitude=NULL;
 
+			fclose(fp);
+
 			return S_FALSE;
 		}
-		for(int i=0;i<nRows;i++)
+		ReleaseMutex(hMutex);
+
+		for (int i = 0; i < m_nRows; )
 		{
-			for(int j=0;j<nCols;j++)
+			if (i+nBlockSize < m_nRows)
 			{
-				double X=LBX+j*m_XCellSize;
-				double Y=LBY+i*m_YCellSize;
-				double dX=X-m_X0;
-				double dY=Y-m_Y0;
-				double x=(dX*cosk+dY*sink)/m_XCellSize;
-				double y=-(-dX*sink+dY*cosk)/m_YCellSize;
-
-				int nCol0=int(x);
-				int nRow0=int(y);
-				int nCol2=nCol0+1;
-				int nRow2=nRow0+1;
-				if((nCol0<0||nCol0>=m_nCols||nRow0<0||nRow0>=m_nRows)&&
-					(nCol2<0||nCol2>=m_nCols||nRow2<0||nRow2>=m_nRows))
+				for (int ny = 0; ny < nBlockSize; ++ny)
 				{
-					double Z=DBL_MAX;
-					m_pImage->SetPixel(i,j,(BYTE*)&Z);
-					continue;
+					double temp=0;
+					int nCount=0;
+					double* pAltitudeIndex=pAltitude+m_nCols*ny;
+					for (int j = 0; j < m_nCols; ++j)
+					{
+						fscanf(fp,"%lf",pAltitudeIndex+j);
+
+						if(fabs(pAltitudeIndex[j]+99999.0)<1e-5)
+						{
+							pAltitudeIndex[j]=DBL_MAX;
+						}
+						else
+						{
+							pAltitudeIndex[j]/=nHZoom;
+							pAltitudeIndex[j]+=m_lfAltitudeOffset;
+
+							if(pAltitudeIndex[j]>m_MaxAltitude)
+							{
+								m_MaxAltitude=pAltitudeIndex[j];
+							}
+							if(pAltitudeIndex[j]<m_MinAltitude)
+							{
+								m_MinAltitude=pAltitudeIndex[j];
+							}
+
+							temp+=pAltitudeIndex[j];
+							nCount++;
+						}
+
+						double X=LBX+j*m_XCellSize;
+						double Y=LBY+(i+ny)*m_YCellSize;
+						double dX=X-m_X0;
+						double dY=Y-m_Y0;
+						double x=(dX*cosk+dY*sink)/m_XCellSize;
+						double y=-(-dX*sink+dY*cosk)/m_YCellSize;
+
+						int nCol0=int(x);
+						int nRow0=int(y)-i;
+						int nCol2=nCol0+1;
+						int nRow2=nRow0+1;
+
+						if((nCol0<0||nCol0>=m_nCols||nRow0<0||nRow0>=nBlockSize)&&
+							(nCol2<0||nCol2>=m_nCols||nRow2<0||nRow2>=nBlockSize))
+						{
+							double Z=DBL_MAX;
+							m_pImage->SetPixel(i+ny, j, (BYTE*)&Z);
+							continue;
+						}
+
+						nCol0=max(nCol0,0);
+						nRow0=max(nRow0,0);
+						nCol0=min(nCol0,m_nCols-1);
+						nRow0=min(nRow0,m_nRows-1);
+						nCol2=max(nCol2,0);
+						nRow2=max(nRow2,0);
+						nCol2=min(nCol2,m_nCols-1);
+						nRow2=min(nRow2,m_nRows-1);
+
+						double dx=x-nCol0;
+						double dy=y-nRow0-i;
+
+						double Z0=pAltitude[nRow0*m_nCols+nCol0];
+						double Z1=pAltitude[nRow0*m_nCols+nCol2];
+						double Z2=pAltitude[nRow2*m_nCols+nCol2];
+						double Z3=pAltitude[nRow2*m_nCols+nCol0];
+
+						double Z=DBL_MAX;
+						if(Z0!=DBL_MAX&&Z1!=DBL_MAX&&Z2!=DBL_MAX&&Z3!=DBL_MAX)
+						{
+							Z=(1.0-dx) *  (1.0-dy)  *  Z0+
+								dx    *  (1.0-dy)  *  Z1+
+								dx    *  dy        *  Z2+
+								(1.0-dx) *  dy        *  Z3;
+
+							Z+=m_lfAltitudeOffset;
+						}
+
+						m_pImage->SetPixel(i+ny, j, (BYTE*)&Z);
+					}
+					if(nCount>0)
+					{
+						m_AveAltitude+=(temp/nCount);
+					}
 				}
-
-				nCol0=max(nCol0,0);
-				nRow0=max(nRow0,0);
-				nCol0=min(nCol0,m_nCols-1);
-				nRow0=min(nRow0,m_nRows-1);
-				nCol2=max(nCol2,0);
-				nRow2=max(nRow2,0);
-				nCol2=min(nCol2,m_nCols-1);
-				nRow2=min(nRow2,m_nRows-1);
-
-				double dx=x-nCol0;
-				double dy=y-nRow0;
-
-				double Z0=pAltitude[nRow0*m_nCols+nCol0];
-				double Z1=pAltitude[nRow0*m_nCols+nCol2];
-				double Z2=pAltitude[nRow2*m_nCols+nCol2];
-				double Z3=pAltitude[nRow2*m_nCols+nCol0];
-
-				double Z=DBL_MAX;
-				if(Z0!=DBL_MAX&&Z1!=DBL_MAX&&Z2!=DBL_MAX&&Z3!=DBL_MAX)
+				i += (nBlockSize-1);
+			}
+			else
+			{
+				for (int ny = 0; ny < m_nRows-i; ++ny)
 				{
-					Z=(1.0-dx) *  (1.0-dy)  *  Z0+
-						dx    *  (1.0-dy)  *  Z1+
-						dx    *  dy        *  Z2+
-						(1.0-dx) *  dy        *  Z3;
+					double temp=0;
+					int nCount=0;
+					double* pAltitudeIndex=pAltitude+m_nCols*ny;
 
-					Z+=m_lfAltitudeOffset;
+					for (int j = 0; j < m_nCols; ++j)
+					{
+						fscanf(fp,"%lf",pAltitudeIndex+j);
+
+						if(fabs(pAltitudeIndex[j]+99999.0)<1e-5)
+						{
+							pAltitudeIndex[j]=DBL_MAX;
+						}
+						else
+						{
+							pAltitudeIndex[j]/=nHZoom;
+							pAltitudeIndex[j]+=m_lfAltitudeOffset;
+
+							if(pAltitudeIndex[j]>m_MaxAltitude)
+							{
+								m_MaxAltitude=pAltitudeIndex[j];
+							}
+							if(pAltitudeIndex[j]<m_MinAltitude)
+							{
+								m_MinAltitude=pAltitudeIndex[j];
+							}
+
+							temp+=pAltitudeIndex[j];
+							nCount++;
+						}
+
+						double X=LBX+j*m_XCellSize;
+						double Y=LBY+(i+ny)*m_YCellSize;
+						double dX=X-m_X0;
+						double dY=Y-m_Y0;
+						double x=(dX*cosk+dY*sink)/m_XCellSize;
+						double y=-(-dX*sink+dY*cosk)/m_YCellSize;
+
+						int nCol0=int(x);
+						int nRow0=int(y)-i;
+						int nCol2=nCol0+1;
+						int nRow2=nRow0+1;
+
+						if((nCol0<0||nCol0>=m_nCols||nRow0<0||nRow0>=m_nRows-i)&&
+							(nCol2<0||nCol2>=m_nCols||nRow2<0||nRow2>=m_nRows-i))
+						{
+							double Z=DBL_MAX;
+							m_pImage->SetPixel(i+ny, j, (BYTE*)&Z);
+							continue;
+						}
+
+						nCol0=max(nCol0,0);
+						nRow0=max(nRow0,0);
+						nCol0=min(nCol0,m_nCols-1);
+						nRow0=min(nRow0,m_nRows-1);
+						nCol2=max(nCol2,0);
+						nRow2=max(nRow2,0);
+						nCol2=min(nCol2,m_nCols-1);
+						nRow2=min(nRow2,m_nRows-1);
+
+						double dx=x-nCol0;
+						double dy=y-nRow0-i;
+
+						double Z0=pAltitude[nRow0*m_nCols+nCol0];
+						double Z1=pAltitude[nRow0*m_nCols+nCol2];
+						double Z2=pAltitude[nRow2*m_nCols+nCol2];
+						double Z3=pAltitude[nRow2*m_nCols+nCol0];
+
+						double Z=DBL_MAX;
+						if(Z0!=DBL_MAX&&Z1!=DBL_MAX&&Z2!=DBL_MAX&&Z3!=DBL_MAX)
+						{
+							Z=(1.0-dx) *  (1.0-dy)  *  Z0+
+								dx    *  (1.0-dy)  *  Z1+
+								dx    *  dy        *  Z2+
+								(1.0-dx) *  dy        *  Z3;
+
+							Z+=m_lfAltitudeOffset;
+						}
+
+						m_pImage->SetPixel(i+ny, j, (BYTE*)&Z);
+					}
+					if(nCount>0)
+					{
+						m_AveAltitude+=(temp/nCount);
+					}
 				}
-
-				m_pImage->SetPixel(i,j,(BYTE*)&Z);
+				i = m_nRows;
 			}
 		}
 	}
+
+	m_AveAltitude/=m_nRows;
+	fclose(fp);
 
 	delete [] pAltitude;
 	pAltitude=NULL;
