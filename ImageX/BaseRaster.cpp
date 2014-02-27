@@ -1213,7 +1213,7 @@ HRESULT CBaseRaster::GetSupExts(BYTE* lpszExts, UINT flags)
 	
 	if ((flags & modeReadWrite) == modeReadWrite)
 	{
-		strcpy((char*)lpszExts, "Tiff file(*.tif;*.tiff)|*.tif; *.tiff|Ecw file(*.ecw)|*.ecw\
+		strcpy((char*)lpszExts, "Tiff file(*.tif;*.tiff)|*.tif; *.tiff\
 								|Erdas file(*.img)|*.img|Hdr file(*.hdr)|*.hdr\
 								|Nitf file(*.ntf)|*.ntf|Bitmap file(*.bmp)|*.bmp|All file (*.*)|*.*||");
 	}
