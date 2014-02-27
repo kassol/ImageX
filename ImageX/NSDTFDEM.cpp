@@ -382,13 +382,13 @@ HRESULT CNSDTFDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMode
 						m_AveAltitude+=(temp/nCount);
 					}
 				}
-				m_pImage->WriteImg(0, i, m_nCols, i+nBlockSize,
+				m_pImage->WriteImg(0, m_nRows-i-nBlockSize, m_nCols, m_nRows-i,
 					(BYTE*)pAltitude, m_nCols, nBlockSize, 1, 0, 0, m_nCols, nBlockSize, -1, 0);
 				i += nBlockSize;
 			}
 			else
 			{
-				for (int y = nBlockSize-1; y >=nBlockSize-1-(m_nRows-i-1); --y)
+				for (int y = m_nRows-i-1; y >= 0; --y)
 				{
 					double temp=0;
 					int nCount=0;
@@ -423,7 +423,7 @@ HRESULT CNSDTFDEM::Open(BSTR bstrPathName, double lfAltitudeOffset, UINT accMode
 						m_AveAltitude+=(temp/nCount);
 					}
 				}
-				m_pImage->WriteImg(0, i, m_nCols, m_nRows,
+				m_pImage->WriteImg(0, 0, m_nCols, m_nRows-i,
 					(BYTE*)pAltitude, m_nCols, nBlockSize, 1, 0, 0, m_nCols, m_nRows-i, -1, 0);
 				i = m_nRows;
 			}
