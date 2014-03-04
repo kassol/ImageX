@@ -124,10 +124,13 @@ HRESULT CJPEGRaster::Close()
 			return S_FALSE;
 		}
 		GDALClose((GDALDatasetH)tempoDataset);
+
+		CBaseRaster::Close();
+
 		CString temPathName = m_strPathName.Left(m_strPathName.ReverseFind('.'))+_T("_temp.tif");
 		DeleteFile(temPathName);
-		temPathName = m_strPathName.Left(m_strPathName.ReverseFind('.'))+_T("_temp.tfw");
-		DeleteFile(temPathName);
+// 		temPathName = m_strPathName.Left(m_strPathName.ReverseFind('.'))+_T("_temp.tfw");
+// 		DeleteFile(temPathName);
 	}
-	return CBaseRaster::Close();
+	return S_OK;
 }
