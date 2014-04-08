@@ -64,6 +64,8 @@ STDMETHODIMP CDEMDriver::Close(void)
 		return S_FALSE;
 	}
 	m_pBaseDEM->Close();
+	delete m_pBaseDEM;
+	m_pBaseDEM = NULL;
 	return S_OK;
 }
 

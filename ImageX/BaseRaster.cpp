@@ -613,6 +613,7 @@ HRESULT CBaseRaster::Close()
 	if (m_poDataset != NULL)
 	{
 		GDALClose((GDALDatasetH)m_poDataset);
+		m_poDataset = NULL;
 	}
 	if (m_bTranto8bit)
 	{

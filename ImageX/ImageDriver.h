@@ -48,6 +48,7 @@ END_COM_MAP()
 	{
 		if(pRaster != NULL)
 		{
+			pRaster->Close();
 			delete pRaster;
 			pRaster = NULL;
 		}

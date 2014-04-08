@@ -132,5 +132,9 @@ HRESULT CJPEGRaster::Close()
 // 		temPathName = m_strPathName.Left(m_strPathName.ReverseFind('.'))+_T("_temp.tfw");
 // 		DeleteFile(temPathName);
 	}
+	else
+	{
+		CBaseRaster::Close();
+	}
 	return S_OK;
 }

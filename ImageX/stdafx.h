@@ -38,9 +38,12 @@
 #include <atlcom.h>
 #include <atlctl.h>
 
-#include "include/gdal_priv.h"
+#include <gdal_priv.h>
 #include <windows.h>
 
-#pragma comment(lib, "lib/gdal_i.lib")
+#pragma comment(lib, "gdal_i.lib")
 #pragma comment( lib, "comsuppw.lib")
 #pragma comment(lib, "lib/CadLib.lib")
+
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
