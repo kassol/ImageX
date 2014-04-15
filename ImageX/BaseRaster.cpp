@@ -1420,7 +1420,9 @@ HRESULT CBaseRaster::Translate(BSTR bstrImgPath)
 
 	GDALDriver* tempoDriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
 
-	GDALDataset* tempoDataset = tempoDriver->CreateCopy(strImgPath.GetBuffer(0), m_poDataset, TRUE, NULL, NULL, NULL);
+	char** ppszOptions = NULL;
+	//ppszOptions = CSLSetNameValue(ppszOptions, "INTERLEAVE", "BIP");
+	GDALDataset* tempoDataset = tempoDriver->CreateCopy(strImgPath.GetBuffer(0), m_poDataset, TRUE, ppszOptions, NULL, NULL);
 	if (tempoDataset == NULL)
 	{
 		return S_FALSE;
