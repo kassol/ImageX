@@ -65,6 +65,7 @@ CBaseRaster::CBaseRaster(void)
 	, m_bTranto8bit(false)
 	, m_plut(NULL)
 {
+	CPLSetConfigOption("GDAL_FILENAME_IS_UTF8","NO");
 	GDALAllRegister();
 }
 
@@ -817,7 +818,7 @@ HRESULT CBaseRaster::GetPixel(int nRows, int nCols, BYTE* pPixel)
 		return S_FALSE;
 	}
 	BYTE* pTmpPixel = (BYTE*)calloc(m_nBandNum,m_nBPB);
-	if (CE_Failure == m_poDataset->RasterIO(GF_Read, nCols, m_nWidth-nRows, 1, 1, pTmpPixel, 1, 1, m_eGDALType, m_nBandNum, NULL, 0, 0, 0))
+	if (CE_Failure == m_poDataset->RasterIO(GF_Read, nCols, m_nHeight-nRows-1, 1, 1, pTmpPixel, 1, 1, m_eGDALType, m_nBandNum, NULL, 0, 0, 0))
 	{
 		return S_FALSE;
 	}
@@ -829,7 +830,7 @@ HRESULT CBaseRaster::GetPixel(int nRows, int nCols, BYTE* pPixel)
 
 HRESULT CBaseRaster::SetPixel(int nRows, int nCols, BYTE* pPixel)
 {
-	if (CE_Failure == m_poDataset->RasterIO(GF_Write, nCols, m_nHeight-nRows, 1, 1, 
+	if (CE_Failure == m_poDataset->RasterIO(GF_Write, nCols, m_nHeight-nRows-1, 1, 1, 
 		pPixel, 1, 1, m_eGDALType, m_nBandNum, NULL, 0, 0, 0))
 	{
 		return S_FALSE;
