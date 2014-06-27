@@ -1241,10 +1241,10 @@ HRESULT CBaseRaster::Image2World(FLOAT x, FLOAT y, DOUBLE* pX, DOUBLE* pY)
 	return S_OK;
 }
 
-HRESULT CBaseRaster::World2Image(DOUBLE X, DOUBLE Y, FLOAT* px, FLOAT* py)
+HRESULT CBaseRaster::World2Image(DOUBLE X, DOUBLE Y, int* px, int* py)
 {
-	*px = FLOAT((X-m_lfxStart)/m_lfCellSize);
-	*py = FLOAT((Y-m_lfyStart)/m_lfCellSize);
+	*px = int((X-m_lfxStart)/m_lfCellSize);
+	*py = int((Y-m_lfyStart)/m_lfCellSize);
 	return S_OK;
 }
 

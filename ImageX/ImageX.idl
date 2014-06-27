@@ -51,7 +51,7 @@ interface IImageX : IDispatch{
 	[id(42), helpstring("SetProgressInterface")] HRESULT SetProgressInterface(IUnknown* pIUnknown);
 	[id(43), helpstring("Get support extension")] HRESULT GetSupExts([out] BYTE* lpszExts, [in] UINT flags);
 	[id(44), helpstring("Image to world")] HRESULT Image2World([in] FLOAT x, [in] FLOAT y, [out] DOUBLE* pX, [out] DOUBLE* pY);
-	[id(45), helpstring("world to Image")] HRESULT World2Image([in] DOUBLE X, [in] DOUBLE Y, [out] FLOAT* px, [out] FLOAT* py);
+	[id(45), helpstring("world to Image")] HRESULT World2Image([in] DOUBLE X, [in] DOUBLE Y, [out] int* px, [out] int* py);
 	[id(46), helpstring("GetDefaultBands")] HRESULT GetDefaultBand([out] int* nBandIndex);
 	[id(47), helpstring("GetCamera")] HRESULT GetCamera([out] BSTR* bstrCamera);
 	[id(48), helpstring("SetCamera")] HRESULT SetCamera([in] BSTR bstrCamera);

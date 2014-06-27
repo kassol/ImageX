@@ -330,7 +330,7 @@ STDMETHODIMP CImageDriver::Image2World(FLOAT x, FLOAT y, DOUBLE* pX, DOUBLE* pY)
 }
 
 
-STDMETHODIMP CImageDriver::World2Image(DOUBLE X, DOUBLE Y, FLOAT* px, FLOAT* py)
+STDMETHODIMP CImageDriver::World2Image(DOUBLE X, DOUBLE Y, int* px, int* py)
 {
 	return pRaster->World2Image(X, Y, px, py);
 }

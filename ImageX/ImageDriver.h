@@ -91,7 +91,7 @@ public:
 	STDMETHOD(SetProgressInterface)(IUnknown* pIUnknown);
 	STDMETHOD(GetSupExts)(BYTE* lpszExts, UINT flags);
 	STDMETHOD(Image2World)(FLOAT x, FLOAT y, DOUBLE* pX, DOUBLE* pY);
-	STDMETHOD(World2Image)(DOUBLE X, DOUBLE Y, FLOAT* px, FLOAT* py);
+	STDMETHOD(World2Image)(DOUBLE X, DOUBLE Y, int* px, int* py);
 	STDMETHOD(GetDefaultBand)(int* nBandIndex);
 	STDMETHOD(GetCamera)(BSTR* bstrCamera);
 	STDMETHOD(SetCamera)(BSTR bstrCamera);

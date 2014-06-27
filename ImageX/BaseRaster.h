@@ -46,7 +46,7 @@ public:
 	virtual HRESULT SetProgressInterface(void* pIUnknown);
 	static HRESULT GetSupExts(BYTE* lpszExts, UINT flags);
 	virtual HRESULT Image2World(FLOAT x, FLOAT y, DOUBLE* pX, DOUBLE* pY);
-	virtual HRESULT World2Image(DOUBLE X, DOUBLE Y, FLOAT* px, FLOAT* py);
+	virtual HRESULT World2Image(DOUBLE X, DOUBLE Y, int* px, int* py);
 	virtual HRESULT GetDefaultBand(int* nBandIndex);
 	virtual HRESULT GetCamera(BSTR* bstrCamera);
 	virtual HRESULT SetCamera(BSTR bstrCamera);
