@@ -62,6 +62,8 @@ interface IImageX : IDispatch{
 	[id(53), helpstring("Tiff2JPG")] HRESULT Tiff2JPG([in] BSTR bstrTiffPath, [in] BSTR bstrJPGPath);
 	[id(54), helpstring("GetTiledSize")] HRESULT GetTiledSize([out] int* nXBlockSize, [out] int* nYBlockSize);
 	[id(55), helpstring("Translate")] HRESULT Translate([in] BSTR bstrImgPath);
+	[id(56), helpstring("GetProjection")] HRESULT GetProjectionRef([out] CHAR** pProjection);
+	[id(57), helpstring("SetProjection")] HRESULT SetProjectionRef([in] CHAR* pProjection);
 };
 [
 	object,

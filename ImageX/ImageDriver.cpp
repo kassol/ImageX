@@ -402,3 +402,19 @@ STDMETHODIMP CImageDriver::Translate(BSTR bstrImgPath)
 
 	return pRaster->Translate(bstrImgPath);
 }
+
+
+STDMETHODIMP CImageDriver::GetProjectionRef(CHAR** pProjection)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	return pRaster->GetProjectionRef(pProjection);
+	return S_OK;
+}
+
+
+STDMETHODIMP CImageDriver::SetProjectionRef(CHAR* pProjection)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	return pRaster->SetProjectionRef(pProjection);
+	return S_OK;
+}

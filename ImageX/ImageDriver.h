@@ -106,6 +106,8 @@ private:
 	CBaseRaster* pRaster;
 public:
 	STDMETHOD(Translate)(BSTR bstrImgPath);
+	STDMETHOD(GetProjectionRef)(CHAR** pProjection);
+	STDMETHOD(SetProjectionRef)(CHAR* pProjection);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ImageDriverX), CImageDriver)

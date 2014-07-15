@@ -57,6 +57,8 @@ public:
 	virtual HRESULT Tiff2JPG(BSTR bstrTiffPath, BSTR bstrJPGPath);
 	virtual HRESULT GetTiledSize(int* nXBlockSize, int* nYBlockSize);
 	virtual HRESULT Translate(BSTR bstrImgPath);
+	virtual HRESULT GetProjectionRef(CHAR** pProjection);
+	virtual HRESULT SetProjectionRef(CHAR* pProjection);
 
 protected:
 	void InitImgInfo();
@@ -89,5 +91,6 @@ protected:
 	float m_fResolution, m_fXResolution, m_fYResolution;
 	bool m_bTranto8bit;
 	BYTE* m_plut;
+	const char *m_projection;
 };
 

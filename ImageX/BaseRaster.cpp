@@ -392,6 +392,7 @@ void CBaseRaster::InitExtInfo()
 	{
 		m_fResolution = -1;
 	}
+	m_projection = m_poDataset->GetProjectionRef();
 }
 
 HRESULT CBaseRaster::InitPyramid()
@@ -1422,5 +1423,20 @@ HRESULT CBaseRaster::Translate(BSTR bstrImgPath)
 		return S_FALSE;
 	}
 	GDALClose((GDALDatasetH)tempoDataset);
+	return S_OK;
+}
+
+HRESULT CBaseRaster::GetProjectionRef(CHAR** pProjection)
+{
+	*pProjection = const_cast<char*>(m_projection);
+	return S_OK;
+}
+
+HRESULT CBaseRaster::SetProjectionRef(CHAR* pProjection)
+{
+	if (pProjection != NULL)
+	{
+		m_poDataset->SetProjection(pProjection);
+	}
 	return S_OK;
 }
