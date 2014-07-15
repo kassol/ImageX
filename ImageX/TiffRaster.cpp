@@ -126,7 +126,7 @@ void CTiffRaster::InitGeoInfo()
 	else
 	{
 		m_lfxStart = m_pGeoTrans[0];
-		m_lfCellSize = abs(m_pGeoTrans[1]);
+		m_lfCellSize = fabs(m_pGeoTrans[1]);
 		m_lfyStart = m_pGeoTrans[3]-m_nHeight*m_lfCellSize;
 	}
 	infile.clear();
