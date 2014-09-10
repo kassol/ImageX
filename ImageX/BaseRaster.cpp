@@ -561,12 +561,12 @@ HRESULT CBaseRaster::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, int Rows
 	}
 	else if (strcmp(pszDriverName, "HFA") == 0)
 	{
-		ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKSIZE", "128");
+		//ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKSIZE", "128");
 	}
 	else if (strcmp(pszDriverName, "NITF") == 0)
 	{
-		ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKXSIZE", "128");
-		ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKYSIZE", "128");
+		//ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKXSIZE", "128");
+		//ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKYSIZE", "128");
 	}
 
 	m_poDataset = poDriver->Create(m_strPathName, Cols, Rows, nBandNum, m_eGDALType, ppszOptions);
