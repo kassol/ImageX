@@ -204,9 +204,9 @@ HRESULT CTiffRaster::CreateImg(BSTR bstrFilePath, UINT uMode, int Cols, int Rows
 	//ppszOptions = CSLSetNameValue(ppszOptions, "TFW", "YES");
 	ppszOptions = CSLSetNameValue(ppszOptions, "BIGTIFF", "IF_NEEDED");
 	//ppszOptions = CSLSetNameValue(ppszOptions, "COMPRESS", "LZW");
-	//ppszOptions = CSLSetNameValue(ppszOptions, "TILED", "YES");
-	//ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKXSIZE", "128");
-	//ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKYSIZE", "128");
+	ppszOptions = CSLSetNameValue(ppszOptions, "TILED", "YES");
+	ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKXSIZE", "128");
+	ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKYSIZE", "128");
 	switch(BandType)
 	{
 	case BIL:

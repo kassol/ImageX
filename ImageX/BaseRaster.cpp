@@ -59,13 +59,13 @@ CBaseRaster::CBaseRaster(void)
 	, m_uMode(0)
 	, m_fxDPI(0)
 	, m_fyDPI(0)
-	,m_fResolution(0)
+	, m_fResolution(0)
 	, m_fXResolution(0)
 	, m_fYResolution(0)
 	, m_bTranto8bit(false)
 	, m_plut(NULL)
 {
-	CPLSetConfigOption("GDAL_FILENAME_IS_UTF8","NO");
+	CPLSetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");
 	GDALAllRegister();
 }
 
@@ -1374,10 +1374,12 @@ HRESULT CBaseRaster::Translate(BSTR bstrImgPath)
 
 	char* pszDriverName = NULL;
 	
-	if (strExt.CompareNoCase(strExtthis) == 0)
-	{
-		return S_FALSE;
-	}
+// 	if (strExt.CompareNoCase(strExtthis) == 0)
+// 	{
+// 		return S_FALSE;
+// 	}
+
+	char** ppszOptions = NULL;
 
 	if (strExt.CompareNoCase("bmp") == 0)
 	{
@@ -1386,6 +1388,9 @@ HRESULT CBaseRaster::Translate(BSTR bstrImgPath)
 	else if (strExt.CompareNoCase("tif") == 0 || strExt.CompareNoCase("tiff") == 0)
 	{
 		pszDriverName = "GTIFF";
+// 		ppszOptions = CSLSetNameValue(ppszOptions, "TILED", "YES");
+// 		ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKXSIZE", "128");
+// 		ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKYSIZE", "128");
 	}
 	else if (strExt.CompareNoCase("jpg") == 0 || strExt.CompareNoCase("jpeg") == 0)
 	{
@@ -1394,6 +1399,7 @@ HRESULT CBaseRaster::Translate(BSTR bstrImgPath)
 	else if (strExt.CompareNoCase("img") == 0)
 	{
 		pszDriverName = "HFA";
+		ppszOptions = CSLSetNameValue(ppszOptions, "BLOCKSIZE", "128");
 	}
 	else if (strExt.CompareNoCase("ntf") == 0)
 	{
@@ -1415,7 +1421,7 @@ HRESULT CBaseRaster::Translate(BSTR bstrImgPath)
 
 	GDALDriver* tempoDriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
 
-	char** ppszOptions = NULL;
+	
 	//ppszOptions = CSLSetNameValue(ppszOptions, "INTERLEAVE", "BIP");
 	GDALDataset* tempoDataset = tempoDriver->CreateCopy(strImgPath.GetBuffer(0), m_poDataset, TRUE, ppszOptions, NULL, NULL);
 	if (tempoDataset == NULL)
